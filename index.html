@@ -2,67 +2,40 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestion rémunération employée de maison</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Employée de maison</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'media',
       theme: {
         extend: {
-          boxShadow: {
-            soft: '0 10px 30px rgba(0,0,0,0.08)',
-          },
-          colors: {
-            apple: {
-              50: '#f5f7fb',
-              100: '#e9eef8',
-              500: '#2563eb',
-              600: '#1d4ed8',
-              700: '#1e40af',
-            },
-          },
-        },
-      },
-    };
+          boxShadow: { soft: '0 10px 30px rgba(0,0,0,0.08)' },
+          colors: { apple: { 500: '#2563eb', 600: '#1d4ed8', 700: '#1e40af' } }
+        }
+      }
+    }
   </script>
   <style>
     html { -webkit-tap-highlight-color: transparent; }
-    body { font-feature-settings: "ss01" on, "cv01" on, "cv11" on; }
-    input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.8; cursor: pointer; }
-    .safe-bottom { padding-bottom: max(7rem, calc(env(safe-area-inset-bottom) + 6.5rem)); }
+    body { font-feature-settings: 'ss01' on, 'cv01' on, 'cv11' on; }
     .page { display: none; }
     .page.active { display: block; }
+    .safe-bottom { padding-bottom: max(7rem, calc(env(safe-area-inset-bottom) + 6rem)); }
+    input[type="date"], input[type="number"], input[type="tel"], input[type="text"], select, textarea {
+      width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box;
+    }
+    input[type="date"] { display: block; appearance: none; -webkit-appearance: none; }
+    input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.85; cursor: pointer; flex-shrink: 0; }
     .fab-shell {
-      position: relative;
-      width: 4rem;
-      height: 4rem;
-      border-radius: 9999px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.88);
-      color: white;
-      backdrop-filter: blur(18px) saturate(180%);
-      -webkit-backdrop-filter: blur(18px) saturate(180%);
-      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.28), 0 6px 14px rgba(15, 23, 42, 0.18);
-      transform: translateY(-1rem);
-      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+      width: 4rem; height: 4rem; border-radius: 9999px; display: flex; align-items: center; justify-content: center;
+      background: rgba(15,23,42,.88); color: white; backdrop-filter: blur(18px) saturate(180%); -webkit-backdrop-filter: blur(18px) saturate(180%);
+      box-shadow: 0 18px 35px rgba(15,23,42,.28), 0 6px 14px rgba(15,23,42,.18);
+      transform: translateY(-1rem); transition: transform .18s ease, box-shadow .18s ease;
     }
-    .fab-shell:active {
-      transform: translateY(-0.85rem) scale(0.97);
-      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.22);
-    }
-    .fab-shell.open svg {
-      transform: rotate(45deg);
-    }
-    .fab-shell svg {
-      transition: transform 180ms ease;
-    }
-    .fab-backdrop {
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
+    .fab-shell:active { transform: translateY(-.85rem) scale(.97); box-shadow: 0 10px 20px rgba(15,23,42,.22); }
+    .fab-shell.open span { transform: rotate(45deg); }
+    .fab-shell span { transition: transform .18s ease; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen">
@@ -73,10 +46,7 @@
         <h1 class="text-2xl font-semibold tracking-tight">Employée de maison</h1>
       </div>
       <button id="exportCsvBtn" class="inline-flex items-center gap-2 rounded-2xl bg-white/80 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-2 text-sm shadow-soft">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M7.5 10.5 12 15m0 0 4.5-4.5M12 15V3" />
-        </svg>
-        CSV
+        <span>⬇️</span><span>CSV</span>
       </button>
     </header>
 
@@ -94,38 +64,13 @@
             </div>
           </div>
           <div class="grid grid-cols-2 gap-3 text-sm">
-            <div class="rounded-2xl bg-white/10 p-3">
-              <p class="text-white/70">Sessions</p>
-              <p class="font-semibold text-base" id="summarySessions">0</p>
-            </div>
-            <div class="rounded-2xl bg-white/10 p-3">
-              <p class="text-white/70">Paiements</p>
-              <p class="font-semibold text-base" id="summaryPayments">0</p>
-            </div>
+            <div class="rounded-2xl bg-white/10 p-3"><p class="text-white/70">Sessions</p><p class="font-semibold text-base" id="summarySessions">0</p></div>
+            <div class="rounded-2xl bg-white/10 p-3"><p class="text-white/70">Paiements</p><p class="font-semibold text-base" id="summaryPayments">0</p></div>
           </div>
         </section>
 
         <section class="grid grid-cols-1 gap-3">
-          <button id="quickAddTodayBtn" class="w-full rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-4 font-medium shadow-soft flex items-center justify-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            Ajouter session aujourd’hui
-          </button>
-          <div class="grid grid-cols-2 gap-3">
-            <button data-go="session" class="nav-shortcut rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-4 text-sm font-medium shadow-soft flex items-center justify-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V8.25A2.25 2.25 0 0 1 5.25 6h13.5A2.25 2.25 0 0 1 21 8.25v10.5A2.25 2.25 0 0 1 18.75 21H5.25A2.25 2.25 0 0 1 3 18.75Z" />
-              </svg>
-              Session
-            </button>
-            <button data-go="payment" class="nav-shortcut rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-4 text-sm font-medium shadow-soft flex items-center justify-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5m-18 0h16.5A1.5 1.5 0 0 1 21.75 9.75v8.25a1.5 1.5 0 0 1-1.5 1.5H3.75a1.5 1.5 0 0 1-1.5-1.5V9.75a1.5 1.5 0 0 1 1.5-1.5Zm12 4.5h3" />
-              </svg>
-              Paiement
-            </button>
-          </div>
+          <button id="quickAddTodayBtn" class="w-full rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-4 font-medium shadow-soft flex items-center justify-center gap-3">➕ Ajouter session aujourd’hui</button>
         </section>
 
         <section class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 shadow-soft">
@@ -153,13 +98,11 @@
           <h2 class="text-xl font-semibold tracking-tight">Ajouter une session</h2>
           <p class="text-sm text-slate-500 dark:text-slate-400">Choisissez une durée rapide ou saisissez une autre valeur.</p>
         </div>
-
         <section class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 shadow-soft space-y-4">
           <div>
             <label for="sessionDateInput" class="block text-sm font-medium mb-1">Date</label>
-            <input id="sessionDateInput" type="date" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" />
+            <input id="sessionDateInput" type="date" class="block rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" />
           </div>
-
           <div>
             <p class="block text-sm font-medium mb-2">Durée</p>
             <div class="grid grid-cols-2 gap-3">
@@ -169,22 +112,18 @@
               <button type="button" id="durationOtherBtn" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm font-medium">Autre</button>
             </div>
           </div>
-
           <div id="customDurationWrap" class="hidden">
             <label for="customDurationInput" class="block text-sm font-medium mb-1">Autre durée (heures)</label>
-            <input id="customDurationInput" type="number" min="0" step="0.25" inputmode="decimal" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Ex : 3.5" />
+            <input id="customDurationInput" type="number" min="0" step="0.25" inputmode="decimal" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Ex : 3.5" />
           </div>
-
           <div>
             <label for="sessionRateInput" class="block text-sm font-medium mb-1">Taux horaire appliqué (€ / h)</label>
-            <input id="sessionRateInput" type="number" min="0" step="0.01" inputmode="decimal" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" />
+            <input id="sessionRateInput" type="number" min="0" step="0.01" inputmode="decimal" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" />
           </div>
-
           <div class="rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 px-4 py-3">
             <p class="text-sm text-slate-500 dark:text-slate-400">Montant calculé</p>
             <p id="sessionComputedDisplay" class="text-xl font-semibold">0,00 €</p>
           </div>
-
           <button id="saveSessionBtn" class="w-full rounded-2xl bg-apple-600 hover:bg-apple-700 text-white px-4 py-3 font-medium">Enregistrer la session</button>
         </section>
       </section>
@@ -194,15 +133,14 @@
           <h2 class="text-xl font-semibold tracking-tight">Ajouter un paiement</h2>
           <p class="text-sm text-slate-500 dark:text-slate-400">Le paiement sera déduit du solde total.</p>
         </div>
-
         <section class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 shadow-soft space-y-4">
           <div>
             <label for="paymentDateInput" class="block text-sm font-medium mb-1">Date</label>
-            <input id="paymentDateInput" type="date" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" />
+            <input id="paymentDateInput" type="date" class="block rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" />
           </div>
           <div>
             <label for="paymentAmountInput" class="block text-sm font-medium mb-1">Montant payé (€)</label>
-            <input id="paymentAmountInput" type="number" min="0" step="0.01" inputmode="decimal" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" />
+            <input id="paymentAmountInput" type="number" min="0" step="0.01" inputmode="decimal" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" />
           </div>
           <button id="savePaymentBtn" class="w-full rounded-2xl bg-apple-600 hover:bg-apple-700 text-white px-4 py-3 font-medium">Enregistrer le paiement</button>
         </section>
@@ -213,13 +151,9 @@
           <h2 class="text-xl font-semibold tracking-tight">Historique des sessions</h2>
           <p class="text-sm text-slate-500 dark:text-slate-400">Sessions et paiements, par ordre chronologique.</p>
         </div>
-
         <section class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden">
-          <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <div>
-              <h3 class="font-semibold text-lg">Historique complet</h3>
-              <p class="text-sm text-slate-500 dark:text-slate-400">Suppression possible en cas d’erreur</p>
-            </div>
+          <div class="p-4 border-b border-slate-200 dark:border-slate-800">
+            <h3 class="font-semibold text-lg">Historique complet</h3>
           </div>
           <div id="historyList" class="divide-y divide-slate-200 dark:divide-slate-800"></div>
         </section>
@@ -228,9 +162,8 @@
       <section id="page-contact" class="page space-y-4">
         <div>
           <h2 class="text-xl font-semibold tracking-tight">Contacter</h2>
-          <p class="text-sm text-slate-500 dark:text-slate-400">Préparez un message, traduisez-le et ouvrez WhatsApp.</p>
+          <p class="text-sm text-slate-500 dark:text-slate-400">Préparez un message et ouvrez ChatGPT ou WhatsApp.</p>
         </div>
-
         <section class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 shadow-soft space-y-4">
           <div>
             <label for="contactMessageInput" class="block text-sm font-medium mb-1">Message en français</label>
@@ -239,47 +172,45 @@
               <button type="button" class="quick-message-btn rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs font-medium" data-message="annuler la session de mercredi">Annuler</button>
               <button type="button" class="quick-message-btn rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs font-medium" data-message="lui préciser les tâches à faire aujourd’hui : changer les draps, passer l’aspirateur et étendre le linge">Tâches</button>
             </div>
-            <textarea id="contactMessageInput" rows="5" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Écrivez votre message..."></textarea>
+            <textarea id="contactMessageInput" rows="5" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Écrivez votre message..."></textarea>
           </div>
           <div class="grid grid-cols-2 gap-3">
-            <button id="openGeminiBtn" class="rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 px-4 py-3 font-medium">Traduire</button>
-            <button id="openWhatsappBtn" class="rounded-2xl bg-apple-600 hover:bg-apple-700 text-white px-4 py-3 font-medium">Ouvrir WhatsApp</button>
+            <button id="openGeminiBtn" class="rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 px-4 py-3 font-medium">Ouvrir ChatGPT</button>
+            <button id="openWhatsappBtn" class="rounded-2xl bg-apple-600 hover:bg-apple-700 text-white px-4 py-3 font-medium">WhatsApp</button>
           </div>
           <div>
-            <label for="translatedMessageOutput" class="block text-sm font-medium mb-1">Message traduit</label>
-            <textarea id="translatedMessageOutput" rows="6" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none" placeholder="La traduction apparaîtra ici..."></textarea>
+            <label for="translatedMessageOutput" class="block text-sm font-medium mb-1">Message prêt à envoyer</label>
+            <textarea id="translatedMessageOutput" rows="6" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none" placeholder="Vous pouvez coller ici le message final si besoin..."></textarea>
           </div>
-          <p class="text-xs text-slate-500 dark:text-slate-400">La traduction utilise un lien vers Google Traduction selon la langue choisie dans les paramètres, puis ouvre WhatsApp avec le texte prêt à envoyer.</p>
         </section>
       </section>
 
-      <section id="page-settings" class="page overflow-y-auto pb-32" space-y-4">
+      <section id="page-settings" class="page overflow-y-auto pb-32 space-y-4">
         <div>
           <h2 class="text-xl font-semibold tracking-tight">Paramétrage</h2>
           <p class="text-sm text-slate-500 dark:text-slate-400">Vos réglages sont sauvegardés automatiquement.</p>
         </div>
-
         <section class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 shadow-soft">
           <div class="space-y-4">
             <div>
               <label for="hourlyRateInput" class="block text-sm font-medium mb-1">Taux horaire (€ / h)</label>
-              <input id="hourlyRateInput" type="number" min="0" step="0.01" inputmode="decimal" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" />
+              <input id="hourlyRateInput" type="number" min="0" step="0.01" inputmode="decimal" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" />
             </div>
             <div>
               <label for="defaultDurationInput" class="block text-sm font-medium mb-1">Durée par défaut (heures)</label>
-              <input id="defaultDurationInput" type="number" min="0" step="0.25" inputmode="decimal" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" />
+              <input id="defaultDurationInput" type="number" min="0" step="0.25" inputmode="decimal" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" />
             </div>
             <div>
-              <label for="contactPhoneInput" class="block text-sm font-medium mb-1">Contact WhatsApp de la femme de ménage</label>
-              <input id="contactPhoneInput" type="tel" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Ex : 33612345678" />
+              <label for="contactPhoneInput" class="block text-sm font-medium mb-1">Contact WhatsApp</label>
+              <input id="contactPhoneInput" type="tel" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Ex : 33612345678" />
             </div>
             <div>
               <label for="contactNameInput" class="block text-sm font-medium mb-1">Prénom de la femme de ménage</label>
-              <input id="contactNameInput" type="text" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Ex : Diana" />
+              <input id="contactNameInput" type="text" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Ex : Diana" />
             </div>
             <div>
-              <label for="translationLanguageSelect" class="block text-sm font-medium mb-1">Langue de traduction</label>
-              <select id="translationLanguageSelect" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500">
+              <label for="translationLanguageSelect" class="block text-sm font-medium mb-1">Langue</label>
+              <select id="translationLanguageSelect" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500">
                 <option value="es">Espagnol</option>
                 <option value="en">Anglais</option>
                 <option value="pt">Portugais</option>
@@ -290,10 +221,9 @@
             </div>
             <div>
               <label for="chatgptPromptTemplateInput" class="block text-sm font-medium mb-1">Prompt ChatGPT personnalisé</label>
-              <textarea id="chatgptPromptTemplateInput" rows="5" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Utilisez les variables {prenom}, {langue}, {message}"></textarea>
-              <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Variables disponibles : <span class="font-medium">{prenom}</span>, <span class="font-medium">{langue}</span>, <span class="font-medium">{message}</span></p>
+              <textarea id="chatgptPromptTemplateInput" rows="5" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Utilisez {prenom}, {langue}, {message}"></textarea>
+              <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Variables : {prenom}, {langue}, {message}</p>
             </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Le montant d’une session reste figé avec le taux horaire enregistré au moment de la saisie.</p>
           </div>
         </section>
       </section>
@@ -301,72 +231,32 @@
   </div>
 
   <nav class="fixed bottom-0 left-0 right-0 z-40 pointer-events-none">
-    <div class="max-w-md mx-auto px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+    <div class="max-w-md mx-auto px-4 pb-[max(.75rem,env(safe-area-inset-bottom))]">
       <div class="pointer-events-auto rounded-[28px] border border-slate-200/80 dark:border-slate-800/80 bg-white/85 dark:bg-slate-950/85 backdrop-blur-xl shadow-soft px-2 py-2">
         <div class="grid grid-cols-5 items-end text-[11px]">
-          <button data-page="dashboard" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 font-medium text-slate-500 dark:text-slate-400">
-            <span class="text-xl leading-none">🏠</span>
-            <span>Accueil</span>
-          </button>
-
-          <button data-page="history" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 font-medium text-slate-500 dark:text-slate-400">
-            <span class="text-xl leading-none">🕒</span>
-            <span>Historique</span>
-          </button>
-
-          <div class="flex justify-center">
-            <button id="addMenuBtn" aria-label="Ajouter" class="pointer-events-auto">
-              <div id="fabShell" class="fab-shell">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5.25v13.5M18.75 12H5.25" /></svg>
-              </div>
-            </button>
-          </div>
-
-          <button data-page="contact" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 font-medium text-slate-500 dark:text-slate-400">
-            <span class="text-xl leading-none">💬</span>
-            <span>Contacter</span>
-          </button>
-
-          <button data-page="settings" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 font-medium text-slate-500 dark:text-slate-400">
-            <span class="text-lg">⚙️</span>
-            <span>Réglages</span>
-          </button>
+          <button data-page="dashboard" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 font-medium text-slate-500 dark:text-slate-400"><span class="text-xl leading-none">🏠</span><span>Accueil</span></button>
+          <button data-page="history" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 font-medium text-slate-500 dark:text-slate-400"><span class="text-xl leading-none">🕒</span><span>Historique</span></button>
+          <div class="flex justify-center"><button id="addMenuBtn" aria-label="Ajouter" class="pointer-events-auto"><div id="fabShell" class="fab-shell"><span class="text-4xl leading-none">＋</span></div></button></div>
+          <button data-page="contact" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 font-medium text-slate-500 dark:text-slate-400"><span class="text-xl leading-none">💬</span><span>Contacter</span></button>
+          <button data-page="settings" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 font-medium text-slate-500 dark:text-slate-400"><span class="text-xl leading-none">⚙️</span><span>Réglages</span></button>
         </div>
       </div>
     </div>
   </nav>
 
-  <div id="addMenuModal" class="hidden fixed inset-0 z-50 fab-backdrop bg-slate-950/30 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-20 flex items-end justify-center">
+  <div id="addMenuModal" class="hidden fixed inset-0 z-50 bg-slate-950/30 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-20 flex items-end justify-center">
     <div class="w-full max-w-md rounded-[28px] border border-slate-200/80 dark:border-slate-800/80 bg-white/88 dark:bg-slate-950/88 backdrop-blur-2xl shadow-2xl p-4">
       <div class="mx-auto mb-4 h-1.5 w-12 rounded-full bg-slate-300 dark:bg-slate-700"></div>
       <div class="space-y-3">
-        <button id="addSessionQuick" class="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/90 px-4 py-4 text-left flex items-center gap-3">
-          <span class="rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300 p-3">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.9" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3.75 8.25h16.5M5.25 21h13.5A1.5 1.5 0 0 0 20.25 19.5v-12A1.5 1.5 0 0 0 18.75 6H5.25a1.5 1.5 0 0 0-1.5 1.5v12A1.5 1.5 0 0 0 5.25 21Z" /></svg>
-          </span>
-          <span>
-            <span class="block font-medium">Ajouter une session</span>
-            <span class="block text-sm text-slate-500 dark:text-slate-400">Enregistrer des heures de ménage</span>
-          </span>
-        </button>
-        <button id="addPaymentQuick" class="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/90 px-4 py-4 text-left flex items-center gap-3">
-          <span class="rounded-2xl bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300 p-3">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.9" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5m-18 0h16.5A1.5 1.5 0 0 1 21.75 9.75v8.25a1.5 1.5 0 0 1-1.5 1.5H3.75a1.5 1.5 0 0 1-1.5-1.5V9.75a1.5 1.5 0 0 1 1.5-1.5Zm12 4.5h3" /></svg>
-          </span>
-          <span>
-            <span class="block font-medium">Ajouter un paiement</span>
-            <span class="block text-sm text-slate-500 dark:text-slate-400">Déduire un montant du solde</span>
-          </span>
-        </button>
+        <button id="addSessionQuick" class="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/90 px-4 py-4 text-left flex items-center gap-3"><span class="text-2xl">🧽</span><span><span class="block font-medium">Ajouter une session</span><span class="block text-sm text-slate-500 dark:text-slate-400">Enregistrer des heures</span></span></button>
+        <button id="addPaymentQuick" class="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/90 px-4 py-4 text-left flex items-center gap-3"><span class="text-2xl">💳</span><span><span class="block font-medium">Ajouter un paiement</span><span class="block text-sm text-slate-500 dark:text-slate-400">Déduire du solde</span></span></button>
         <button id="closeAddMenu" class="w-full rounded-2xl px-4 py-3 text-sm font-medium text-slate-500 dark:text-slate-400">Fermer</button>
       </div>
     </div>
   </div>
-  </div>
 
   <script>
-    const STORAGE_KEY = 'employeMaisonAppV2';
-
+    const STORAGE_KEY = 'employeMaisonAppV5';
     const defaultState = {
       settings: {
         hourlyRate: 12,
@@ -374,65 +264,17 @@
         contactPhone: '',
         contactName: '',
         translationLanguage: 'es',
-        chatgptPromptTemplate: 'Prépare un message simple, poli et naturel à ma femme de ménage {prenom} en {langue} : {message}',
+        chatgptPromptTemplate: 'Prépare un message simple, poli et naturel à ma femme de ménage {prenom} en {langue} : {message}'
       },
-      ui: {
-        currentPage: 'dashboard',
-        selectedDurationMode: 'preset',
-        selectedDurationValue: 2.5,
-      },
-      entries: [],
+      ui: { currentPage: 'dashboard', selectedDurationMode: 'preset', selectedDurationValue: 2.5 },
+      entries: []
     };
 
-    let state = loadState();
-
-    const pageIds = ['dashboard', 'session', 'payment', 'history', 'contact', 'settings'];
-
-    const balanceDisplay = document.getElementById('balanceDisplay');
-    const summaryDue = document.getElementById('summaryDue');
-    const summarySessions = document.getElementById('summarySessions');
-    const summaryPayments = document.getElementById('summaryPayments');
-    const lastSessionDisplay = document.getElementById('lastSessionDisplay');
-    const lastPaymentDisplay = document.getElementById('lastPaymentDisplay');
-    const historyList = document.getElementById('historyList');
-    const exportCsvBtn = document.getElementById('exportCsvBtn');
-
-    const hourlyRateInput = document.getElementById('hourlyRateInput');
-    const defaultDurationInput = document.getElementById('defaultDurationInput');
-    const contactPhoneInput = document.getElementById('contactPhoneInput');
-    const contactNameInput = document.getElementById('contactNameInput');
-    const chatgptPromptTemplateInput = document.getElementById('chatgptPromptTemplateInput');
-    const translationLanguageSelect = document.getElementById('translationLanguageSelect');
-
-    const quickAddTodayBtn = document.getElementById('quickAddTodayBtn');
-    const sessionDateInput = document.getElementById('sessionDateInput');
-    const sessionRateInput = document.getElementById('sessionRateInput');
-    const customDurationWrap = document.getElementById('customDurationWrap');
-    const customDurationInput = document.getElementById('customDurationInput');
-    const sessionComputedDisplay = document.getElementById('sessionComputedDisplay');
-    const saveSessionBtn = document.getElementById('saveSessionBtn');
-    const durationOtherBtn = document.getElementById('durationOtherBtn');
-    const durationButtons = Array.from(document.querySelectorAll('.duration-option'));
-
-    const paymentDateInput = document.getElementById('paymentDateInput');
-    const paymentAmountInput = document.getElementById('paymentAmountInput');
-    const savePaymentBtn = document.getElementById('savePaymentBtn');
-
-    const contactMessageInput = document.getElementById('contactMessageInput');
-    const translatedMessageOutput = document.getElementById('translatedMessageOutput');
-    const openGeminiBtn = document.getElementById('openGeminiBtn');
-    const quickMessageButtons = Array.from(document.querySelectorAll('.quick-message-btn'));
-    const openWhatsappBtn = document.getElementById('openWhatsappBtn');
-    const addMenuBtn = document.getElementById('addMenuBtn');
-    const addMenuModal = document.getElementById('addMenuModal');
-    const addSessionQuick = document.getElementById('addSessionQuick');
-    const addPaymentQuick = document.getElementById('addPaymentQuick');
-    const closeAddMenu = document.getElementById('closeAddMenu');
-
+    function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
     function loadState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return structuredClone(defaultState);
+        if (!raw) return clone(defaultState);
         const parsed = JSON.parse(raw);
         return {
           settings: {
@@ -441,425 +283,173 @@
             contactPhone: String(parsed?.settings?.contactPhone ?? defaultState.settings.contactPhone),
             contactName: String(parsed?.settings?.contactName ?? defaultState.settings.contactName),
             translationLanguage: String(parsed?.settings?.translationLanguage ?? defaultState.settings.translationLanguage),
-            chatgptPromptTemplate: String(parsed?.settings?.chatgptPromptTemplate ?? defaultState.settings.chatgptPromptTemplate),
+            chatgptPromptTemplate: String(parsed?.settings?.chatgptPromptTemplate ?? defaultState.settings.chatgptPromptTemplate)
           },
           ui: {
             currentPage: parsed?.ui?.currentPage ?? defaultState.ui.currentPage,
             selectedDurationMode: parsed?.ui?.selectedDurationMode ?? defaultState.ui.selectedDurationMode,
-            selectedDurationValue: Number(parsed?.ui?.selectedDurationValue ?? defaultState.ui.selectedDurationValue),
+            selectedDurationValue: Number(parsed?.ui?.selectedDurationValue ?? defaultState.ui.selectedDurationValue)
           },
-          entries: Array.isArray(parsed?.entries) ? parsed.entries : [],
+          entries: Array.isArray(parsed?.entries) ? parsed.entries : []
         };
       } catch {
-        return structuredClone(defaultState);
+        return clone(defaultState);
       }
     }
 
-    function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
+    let state = loadState();
+    const $ = id => document.getElementById(id);
+    const els = {
+      balanceDisplay: $('balanceDisplay'), summaryDue: $('summaryDue'), summarySessions: $('summarySessions'), summaryPayments: $('summaryPayments'),
+      lastSessionDisplay: $('lastSessionDisplay'), lastPaymentDisplay: $('lastPaymentDisplay'), historyList: $('historyList'), exportCsvBtn: $('exportCsvBtn'),
+      hourlyRateInput: $('hourlyRateInput'), defaultDurationInput: $('defaultDurationInput'), contactPhoneInput: $('contactPhoneInput'), contactNameInput: $('contactNameInput'),
+      chatgptPromptTemplateInput: $('chatgptPromptTemplateInput'), translationLanguageSelect: $('translationLanguageSelect'),
+      quickAddTodayBtn: $('quickAddTodayBtn'), sessionDateInput: $('sessionDateInput'), sessionRateInput: $('sessionRateInput'), customDurationWrap: $('customDurationWrap'),
+      customDurationInput: $('customDurationInput'), sessionComputedDisplay: $('sessionComputedDisplay'), saveSessionBtn: $('saveSessionBtn'), durationOtherBtn: $('durationOtherBtn'),
+      paymentDateInput: $('paymentDateInput'), paymentAmountInput: $('paymentAmountInput'), savePaymentBtn: $('savePaymentBtn'),
+      contactMessageInput: $('contactMessageInput'), translatedMessageOutput: $('translatedMessageOutput'), openGeminiBtn: $('openGeminiBtn'), openWhatsappBtn: $('openWhatsappBtn'),
+      addMenuBtn: $('addMenuBtn'), addMenuModal: $('addMenuModal'), addSessionQuick: $('addSessionQuick'), addPaymentQuick: $('addPaymentQuick'), closeAddMenu: $('closeAddMenu'), fabShell: $('fabShell')
+    };
+    const durationButtons = Array.from(document.querySelectorAll('.duration-option'));
+    const quickMessageButtons = Array.from(document.querySelectorAll('.quick-message-btn'));
 
-    function euro(value) {
-      return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(Number(value || 0));
-    }
-
-    function formatDate(dateString) {
-      const date = new Date(dateString + 'T12:00:00');
-      return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(date);
-    }
-
-    function todayISO() {
-      const now = new Date();
-      const tzOffset = now.getTimezoneOffset() * 60000;
-      return new Date(now - tzOffset).toISOString().split('T')[0];
-    }
+    function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    function euro(v) { return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(Number(v || 0)); }
+    function formatDate(s) { return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(s + 'T12:00:00')); }
+    function todayISO() { const n = new Date(); const o = n.getTimezoneOffset() * 60000; return new Date(n - o).toISOString().split('T')[0]; }
+    function normalizePhone(value) { let phone = String(value || '').replace(/[^\d+]/g, '').trim(); if (phone.startsWith('+')) phone = phone.slice(1); if (phone.startsWith('00')) phone = phone.slice(2); if (phone.startsWith('0')) phone = '33' + phone.slice(1); return phone.replace(/[^\d]/g, ''); }
+    function csvEscape(str) { str = String(str ?? ''); return /[";\n]/.test(str) ? '"' + str.replace(/"/g, '""') + '"' : str; }
 
     function computeTotals() {
       const sessions = state.entries.filter(e => e.type === 'session');
       const payments = state.entries.filter(e => e.type === 'payment');
-      const totalDue = sessions.reduce((sum, e) => sum + Number(e.amount || 0), 0);
-      const totalPaid = payments.reduce((sum, e) => sum + Number(e.amount || 0), 0);
-      return {
-        totalDue,
-        totalPaid,
-        balance: totalDue - totalPaid,
-        sessionsCount: sessions.length,
-        paymentsCount: payments.length,
-      };
+      const totalDue = sessions.reduce((s, e) => s + Number(e.amount || 0), 0);
+      const totalPaid = payments.reduce((s, e) => s + Number(e.amount || 0), 0);
+      return { totalDue, totalPaid, balance: totalDue - totalPaid, sessionsCount: sessions.length, paymentsCount: payments.length };
     }
 
     function sortedEntries() {
-      return [...state.entries].sort((a, b) => {
-        const dateCompare = b.date.localeCompare(a.date);
-        if (dateCompare !== 0) return dateCompare;
-        return (b.createdAt || '').localeCompare(a.createdAt || '');
+      return state.entries.slice().sort((a, b) => {
+        const d = String(b.date).localeCompare(String(a.date));
+        if (d !== 0) return d;
+        return String(b.createdAt || '').localeCompare(String(a.createdAt || ''));
       });
-    }
-
-    function getSelectedDuration() {
-      if (state.ui.selectedDurationMode === 'custom') {
-        return Number(customDurationInput.value || 0);
-      }
-      return Number(state.ui.selectedDurationValue || 0);
     }
 
     function setCurrentPage(page) {
       state.ui.currentPage = page;
       document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-      document.getElementById(`page-${page}`).classList.add('active');
+      const pageEl = $('page-' + page);
+      if (pageEl) pageEl.classList.add('active');
       document.querySelectorAll('.nav-btn').forEach(btn => {
         const active = btn.dataset.page === page;
-        btn.className = `nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 font-medium text-[11px] ${active ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`;
+        btn.className = 'nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 font-medium text-[11px] ' + (active ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400');
       });
       saveState();
     }
 
     function renderSettings() {
-      hourlyRateInput.value = state.settings.hourlyRate;
-      defaultDurationInput.value = state.settings.defaultDuration;
-      contactPhoneInput.value = state.settings.contactPhone;
-      contactNameInput.value = state.settings.contactName || ''; 
-      translationLanguageSelect.value = state.settings.translationLanguage;
-      chatgptPromptTemplateInput.value = state.settings.chatgptPromptTemplate || ''; 
-      sessionRateInput.value = state.settings.hourlyRate;
-      sessionDateInput.value = sessionDateInput.value || todayISO();
-      paymentDateInput.value = paymentDateInput.value || todayISO();
+      els.hourlyRateInput.value = state.settings.hourlyRate;
+      els.defaultDurationInput.value = state.settings.defaultDuration;
+      els.contactPhoneInput.value = state.settings.contactPhone;
+      els.contactNameInput.value = state.settings.contactName;
+      els.translationLanguageSelect.value = state.settings.translationLanguage;
+      els.chatgptPromptTemplateInput.value = state.settings.chatgptPromptTemplate;
+      if (!els.sessionDateInput.value) els.sessionDateInput.value = todayISO();
+      if (!els.paymentDateInput.value) els.paymentDateInput.value = todayISO();
+      if (!els.sessionRateInput.value) els.sessionRateInput.value = state.settings.hourlyRate;
     }
 
     function renderSummary() {
       const totals = computeTotals();
-      balanceDisplay.textContent = euro(totals.balance);
-      summaryDue.textContent = euro(Math.max(0, totals.balance));
-      summarySessions.textContent = totals.sessionsCount;
-      summaryPayments.textContent = totals.paymentsCount;
-
+      els.balanceDisplay.textContent = euro(totals.balance);
+      els.summaryDue.textContent = euro(Math.max(0, totals.balance));
+      els.summarySessions.textContent = String(totals.sessionsCount);
+      els.summaryPayments.textContent = String(totals.paymentsCount);
       const lastSession = sortedEntries().find(e => e.type === 'session');
       const lastPayment = sortedEntries().find(e => e.type === 'payment');
-      lastSessionDisplay.textContent = lastSession ? `${formatDate(lastSession.date)} · ${lastSession.duration}h` : 'Aucune';
-      lastPaymentDisplay.textContent = lastPayment ? `${formatDate(lastPayment.date)} · ${euro(lastPayment.amount)}` : 'Aucun';
+      els.lastSessionDisplay.textContent = lastSession ? formatDate(lastSession.date) + ' · ' + lastSession.duration + 'h' : 'Aucune';
+      els.lastPaymentDisplay.textContent = lastPayment ? formatDate(lastPayment.date) + ' · ' + euro(lastPayment.amount) : 'Aucun';
     }
 
     function renderHistory() {
       const entries = sortedEntries();
       if (!entries.length) {
-        historyList.innerHTML = `<div class="p-6 text-center text-sm text-slate-500 dark:text-slate-400">Aucune donnée pour le moment.</div>`;
+        els.historyList.innerHTML = '<div class="p-6 text-center text-sm text-slate-500 dark:text-slate-400">Aucune donnée pour le moment.</div>';
         return;
       }
-
-      historyList.innerHTML = entries.map(entry => {
+      els.historyList.innerHTML = entries.map(entry => {
         const isSession = entry.type === 'session';
-        const icon = isSession
-          ? `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>`
-          : `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5m-18 0h16.5A1.5 1.5 0 0 1 21.75 9.75v8.25a1.5 1.5 0 0 1-1.5 1.5H3.75a1.5 1.5 0 0 1-1.5-1.5V9.75a1.5 1.5 0 0 1 1.5-1.5Zm12 4.5h3" /></svg>`;
-        const badgeClasses = isSession ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300';
-        const title = isSession ? 'Session' : 'Paiement';
-        const details = isSession ? `${entry.duration} h · ${euro(entry.rate)}/h` : 'Montant enregistré';
-        const amountPrefix = isSession ? '+' : '-';
-
-        return `
-          <div class="p-4 flex items-start gap-3">
-            <div class="mt-0.5 rounded-2xl p-2 ${badgeClasses}">${icon}</div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-start justify-between gap-3">
-                <div>
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <p class="font-medium">${title}</p>
-                    <span class="text-xs px-2 py-1 rounded-full ${badgeClasses}">${formatDate(entry.date)}</span>
-                  </div>
-                  <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">${details}</p>
-                </div>
-                <div class="text-right shrink-0">
-                  <p class="font-semibold whitespace-nowrap">${amountPrefix} ${euro(entry.amount)}</p>
-                </div>
-              </div>
-              <div class="mt-3 flex justify-end">
-                <button data-id="${entry.id}" class="delete-btn text-sm text-red-600 dark:text-red-400 font-medium">Supprimer</button>
-              </div>
-            </div>
-          </div>
-        `;
+        return '<div class="p-4 flex items-start gap-3">'
+          + '<div class="mt-0.5 rounded-2xl px-3 py-2 bg-slate-100 dark:bg-slate-800">' + (isSession ? '🧽' : '💳') + '</div>'
+          + '<div class="flex-1 min-w-0">'
+          + '<div class="flex items-start justify-between gap-3">'
+          + '<div><div class="flex items-center gap-2 flex-wrap"><p class="font-medium">' + (isSession ? 'Session' : 'Paiement') + '</p><span class="text-xs px-2 py-1 rounded-full bg-slate-100 dark:bg-slate-800">' + formatDate(entry.date) + '</span></div><p class="text-sm text-slate-500 dark:text-slate-400 mt-1">' + (isSession ? (entry.duration + ' h · ' + euro(entry.rate) + '/h') : 'Montant enregistré') + '</p></div>'
+          + '<div class="text-right shrink-0"><p class="font-semibold whitespace-nowrap">' + (isSession ? '+' : '-') + ' ' + euro(entry.amount) + '</p></div>'
+          + '</div><div class="mt-3 flex justify-end"><button data-id="' + entry.id + '" class="delete-btn text-sm text-red-600 dark:text-red-400 font-medium">Supprimer</button></div></div></div>';
       }).join('');
-
-      document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', () => deleteEntry(btn.dataset.id));
-      });
+      document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', () => deleteEntry(btn.dataset.id)));
     }
+
+    function getSelectedDuration() { return state.ui.selectedDurationMode === 'custom' ? Number(els.customDurationInput.value || 0) : Number(state.ui.selectedDurationValue || 0); }
+    function updateSessionComputedAmount() { els.sessionComputedDisplay.textContent = euro(getSelectedDuration() * Number(els.sessionRateInput.value || 0)); }
 
     function renderDurationSelection() {
       durationButtons.forEach(btn => {
         const active = state.ui.selectedDurationMode === 'preset' && Number(btn.dataset.value) === Number(state.ui.selectedDurationValue);
-        btn.className = `duration-option rounded-2xl border px-4 py-3 text-sm font-medium ${active ? 'border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900' : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950'}`;
+        btn.className = 'duration-option rounded-2xl border px-4 py-3 text-sm font-medium ' + (active ? 'border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900' : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950');
       });
-
-      const isCustom = state.ui.selectedDurationMode === 'custom';
-      durationOtherBtn.className = `rounded-2xl border px-4 py-3 text-sm font-medium ${isCustom ? 'border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900' : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950'}`;
-      customDurationWrap.classList.toggle('hidden', !isCustom);
-      if (isCustom && !customDurationInput.value) {
-        customDurationInput.value = state.settings.defaultDuration;
-      }
+      const custom = state.ui.selectedDurationMode === 'custom';
+      els.durationOtherBtn.className = 'rounded-2xl border px-4 py-3 text-sm font-medium ' + (custom ? 'border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900' : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950');
+      els.customDurationWrap.classList.toggle('hidden', !custom);
+      if (custom && !els.customDurationInput.value) els.customDurationInput.value = state.settings.defaultDuration;
       updateSessionComputedAmount();
     }
 
-    function render() {
-      saveState();
-      renderSettings();
-      renderSummary();
-      renderHistory();
-      renderDurationSelection();
-      setCurrentPage(state.ui.currentPage);
-    }
-
-    function updateSessionComputedAmount() {
-      const duration = getSelectedDuration();
-      const rate = Number(sessionRateInput.value || 0);
-      sessionComputedDisplay.textContent = euro(duration * rate);
-    }
-
-    function addSession({ date, duration, rate }) {
-      const amount = Number(duration) * Number(rate);
-      state.entries.push({
-        id: crypto.randomUUID(),
-        type: 'session',
-        date,
-        duration: Number(duration),
-        rate: Number(rate),
-        amount: Number(amount.toFixed(2)),
-        createdAt: new Date().toISOString(),
-      });
-      render();
-    }
-
-    function addPayment({ date, amount }) {
-      state.entries.push({
-        id: crypto.randomUUID(),
-        type: 'payment',
-        date,
-        amount: Number(Number(amount).toFixed(2)),
-        createdAt: new Date().toISOString(),
-      });
-      render();
-    }
-
-    function deleteEntry(id) {
-      const entry = state.entries.find(e => e.id === id);
-      if (!entry) return;
-      const label = entry.type === 'session' ? 'cette session' : 'ce paiement';
-      if (!confirm(`Supprimer ${label} ?`)) return;
-      state.entries = state.entries.filter(e => e.id !== id);
-      render();
-    }
+    function render() { saveState(); renderSettings(); renderSummary(); renderHistory(); renderDurationSelection(); setCurrentPage(state.ui.currentPage); }
+    function addSession(date, duration, rate) { state.entries.push({ id: crypto.randomUUID(), type: 'session', date, duration: Number(duration), rate: Number(rate), amount: Number((Number(duration) * Number(rate)).toFixed(2)), createdAt: new Date().toISOString() }); render(); }
+    function addPayment(date, amount) { state.entries.push({ id: crypto.randomUUID(), type: 'payment', date, amount: Number(Number(amount).toFixed(2)), createdAt: new Date().toISOString() }); render(); }
+    function deleteEntry(id) { const entry = state.entries.find(e => e.id === id); if (!entry) return; if (!confirm('Supprimer ' + (entry.type === 'session' ? 'cette session' : 'ce paiement') + ' ?')) return; state.entries = state.entries.filter(e => e.id !== id); render(); }
 
     function exportCsv() {
-      const rows = [['type', 'date', 'duree_heures', 'taux_horaire', 'montant']];
-      sortedEntries().reverse().forEach(entry => {
-        rows.push([
-          entry.type,
-          entry.date,
-          entry.type === 'session' ? String(entry.duration) : '',
-          entry.type === 'session' ? String(entry.rate) : '',
-          String(entry.amount),
-        ]);
-      });
-      const csv = rows.map(row => row.map(csvEscape).join(';')).join('\n');
+      const rows = [['type','date','duree_heures','taux_horaire','montant']];
+      sortedEntries().reverse().forEach(entry => rows.push([entry.type, entry.date, entry.type === 'session' ? entry.duration : '', entry.type === 'session' ? entry.rate : '', entry.amount]));
+      const csv = rows.map(r => r.map(csvEscape).join(';')).join('\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url;
-      a.download = `remuneration-employe-maison-${todayISO()}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      a.href = url; a.download = 'remuneration-employe-maison-' + todayISO() + '.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
     }
 
-    function csvEscape(value) {
-      const str = String(value ?? '');
-      if (/[";\n]/.test(str)) return '"' + str.replace(/"/g, '""') + '"';
-      return str;
-    }
+    function openAddMenu() { els.addMenuModal.classList.remove('hidden'); els.fabShell.classList.add('open'); }
+    function closeAddMenuSheet() { els.addMenuModal.classList.add('hidden'); els.fabShell.classList.remove('open'); }
 
-    function normalizePhone(value) {
-      return String(value || '').replace(/[^\d]/g, '');
-    }
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => setCurrentPage(btn.dataset.page)));
+    els.exportCsvBtn.addEventListener('click', exportCsv);
+    els.quickAddTodayBtn.addEventListener('click', () => addSession(todayISO(), state.settings.defaultDuration, state.settings.hourlyRate));
+    els.hourlyRateInput.addEventListener('change', () => { state.settings.hourlyRate = Number(Math.max(0, Number(els.hourlyRateInput.value || 0)).toFixed(2)); if (!els.sessionRateInput.dataset.userEdited) els.sessionRateInput.value = state.settings.hourlyRate; render(); });
+    els.defaultDurationInput.addEventListener('change', () => { state.settings.defaultDuration = Number(Math.max(0, Number(els.defaultDurationInput.value || 0)).toFixed(2)); saveState(); });
+    els.contactPhoneInput.addEventListener('change', () => { state.settings.contactPhone = els.contactPhoneInput.value.trim(); saveState(); });
+    els.contactNameInput.addEventListener('change', () => { state.settings.contactName = els.contactNameInput.value.trim(); saveState(); });
+    els.translationLanguageSelect.addEventListener('change', () => { state.settings.translationLanguage = els.translationLanguageSelect.value; saveState(); });
+    els.chatgptPromptTemplateInput.addEventListener('change', () => { state.settings.chatgptPromptTemplate = els.chatgptPromptTemplateInput.value.trim() || defaultState.settings.chatgptPromptTemplate; saveState(); });
+    durationButtons.forEach(btn => btn.addEventListener('click', () => { state.ui.selectedDurationMode = 'preset'; state.ui.selectedDurationValue = Number(btn.dataset.value); renderDurationSelection(); saveState(); }));
+    els.durationOtherBtn.addEventListener('click', () => { state.ui.selectedDurationMode = 'custom'; renderDurationSelection(); saveState(); });
+    els.customDurationInput.addEventListener('input', updateSessionComputedAmount);
+    els.sessionRateInput.addEventListener('input', () => { els.sessionRateInput.dataset.userEdited = '1'; updateSessionComputedAmount(); });
+    els.saveSessionBtn.addEventListener('click', () => { const date = els.sessionDateInput.value || todayISO(); const duration = Number(getSelectedDuration()); const rate = Number(els.sessionRateInput.value || 0); if (duration <= 0 || rate < 0) return alert('Merci de renseigner une durée valide et un taux horaire correct.'); addSession(date, duration, rate); els.sessionDateInput.value = todayISO(); els.sessionRateInput.value = state.settings.hourlyRate; els.sessionRateInput.dataset.userEdited = ''; if (state.ui.selectedDurationMode === 'custom') els.customDurationInput.value = ''; setCurrentPage('history'); });
+    els.savePaymentBtn.addEventListener('click', () => { const date = els.paymentDateInput.value || todayISO(); const amount = Number(els.paymentAmountInput.value || 0); if (amount <= 0) return alert('Merci de renseigner un montant valide.'); addPayment(date, amount); els.paymentDateInput.value = todayISO(); els.paymentAmountInput.value = ''; setCurrentPage('history'); });
+    quickMessageButtons.forEach(btn => btn.addEventListener('click', () => { els.contactMessageInput.value = btn.dataset.message || ''; }));
+    els.openGeminiBtn.addEventListener('click', () => { const text = els.contactMessageInput.value.trim(); if (!text) return alert('Merci de rédiger un message.'); const selectedLanguage = els.translationLanguageSelect.options[els.translationLanguageSelect.selectedIndex]?.text?.toLowerCase() || 'la langue choisie'; const contactName = (state.settings.contactName || '').trim(); const template = (state.settings.chatgptPromptTemplate || defaultState.settings.chatgptPromptTemplate).trim(); const prompt = template.replaceAll('{prenom}', contactName || 'ma femme de ménage').replaceAll('{langue}', selectedLanguage).replaceAll('{message}', text); window.open('https://chatgpt.com/?q=' + encodeURIComponent(prompt), '_blank'); });
+    els.openWhatsappBtn.addEventListener('click', () => { const phone = normalizePhone(state.settings.contactPhone); if (!phone) { setCurrentPage('settings'); return alert('Merci de renseigner le contact WhatsApp dans les paramètres.'); } const text = (els.translatedMessageOutput.value || els.contactMessageInput.value || '').trim(); if (!text) return alert('Merci de rédiger un message avant d’ouvrir WhatsApp.'); window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(text), '_blank'); });
+    els.addMenuBtn.addEventListener('click', openAddMenu);
+    els.addSessionQuick.addEventListener('click', () => { closeAddMenuSheet(); setCurrentPage('session'); });
+    els.addPaymentQuick.addEventListener('click', () => { closeAddMenuSheet(); setCurrentPage('payment'); });
+    els.closeAddMenu.addEventListener('click', closeAddMenuSheet);
+    els.addMenuModal.addEventListener('click', e => { if (e.target === els.addMenuModal) closeAddMenuSheet(); });
 
-    function buildTranslationUrl(text) {
-      const target = state.settings.translationLanguage || 'es';
-      return `https://translate.google.com/?sl=fr&tl=${encodeURIComponent(target)}&text=${encodeURIComponent(text)}&op=translate`;
-    }
-
-    function fakeTranslateText(text) {
-      const lang = translationLanguageSelect.options[translationLanguageSelect.selectedIndex]?.text || 'Langue choisie';
-      return `[À traduire en ${lang}]\n\n${text}`;
-    }
-
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => setCurrentPage(btn.dataset.page));
-    });
-
-    document.querySelectorAll('.nav-shortcut').forEach(btn => {
-      btn.addEventListener('click', () => setCurrentPage(btn.dataset.go));
-    });
-
-    exportCsvBtn.addEventListener('click', exportCsv);
-
-    hourlyRateInput.addEventListener('change', () => {
-      state.settings.hourlyRate = Number(Math.max(0, Number(hourlyRateInput.value || 0)).toFixed(2));
-      if (!sessionRateInput.dataset.userEdited) sessionRateInput.value = state.settings.hourlyRate;
-      render();
-    });
-
-    defaultDurationInput.addEventListener('change', () => {
-      state.settings.defaultDuration = Number(Math.max(0, Number(defaultDurationInput.value || 0)).toFixed(2));
-      render();
-    });
-
-    contactPhoneInput.addEventListener('change', () => {
-      state.settings.contactPhone = contactPhoneInput.value.trim();
-      saveState();
-    });
-
-    contactNameInput.addEventListener('change', () => {
-      state.settings.contactName = contactNameInput.value.trim();
-      saveState();
-    });
-
-    translationLanguageSelect.addEventListener('change', () => {
-      state.settings.translationLanguage = translationLanguageSelect.value;
-      saveState();
-    });
-
-    chatgptPromptTemplateInput.addEventListener('change', () => {
-      state.settings.chatgptPromptTemplate = chatgptPromptTemplateInput.value.trim() || defaultState.settings.chatgptPromptTemplate;
-      saveState();
-    });
-
-    durationButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        state.ui.selectedDurationMode = 'preset';
-        state.ui.selectedDurationValue = Number(btn.dataset.value);
-        renderDurationSelection();
-        saveState();
-      });
-    });
-
-    durationOtherBtn.addEventListener('click', () => {
-      state.ui.selectedDurationMode = 'custom';
-      renderDurationSelection();
-      saveState();
-    });
-
-    customDurationInput.addEventListener('input', updateSessionComputedAmount);
-    sessionRateInput.addEventListener('input', () => {
-      sessionRateInput.dataset.userEdited = '1';
-      updateSessionComputedAmount();
-    });
-
-    quickAddTodayBtn.addEventListener('click', () => {
-      addSession({
-        date: todayISO(),
-        duration: state.settings.defaultDuration,
-        rate: state.settings.hourlyRate,
-      });
-    });
-
-    saveSessionBtn.addEventListener('click', () => {
-      const date = sessionDateInput.value || todayISO();
-      const duration = Number(getSelectedDuration());
-      const rate = Number(sessionRateInput.value || 0);
-      if (duration <= 0 || rate < 0) {
-        alert('Merci de renseigner une durée valide et un taux horaire correct.');
-        return;
-      }
-      addSession({ date, duration, rate });
-      sessionDateInput.value = todayISO();
-      paymentAmountInput.value = '';
-      sessionRateInput.value = state.settings.hourlyRate;
-      sessionRateInput.dataset.userEdited = '';
-      if (state.ui.selectedDurationMode === 'custom') customDurationInput.value = '';
-      setCurrentPage('history');
-    });
-
-    savePaymentBtn.addEventListener('click', () => {
-      const date = paymentDateInput.value || todayISO();
-      const amount = Number(paymentAmountInput.value || 0);
-      if (amount <= 0) {
-        alert('Merci de renseigner un montant valide.');
-        return;
-      }
-      addPayment({ date, amount });
-      paymentDateInput.value = todayISO();
-      paymentAmountInput.value = '';
-      setCurrentPage('history');
-    });
-
-    quickMessageButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        contactMessageInput.value = btn.dataset.message || '';
-      });
-    });
-
-    openGeminiBtn.addEventListener('click', () => {
-      const text = contactMessageInput.value.trim();
-
-      if (!text) {
-        alert('Merci de rédiger un message.');
-        return;
-      }
-
-      const selectedLanguage = translationLanguageSelect.options[translationLanguageSelect.selectedIndex]?.text?.toLowerCase() || 'la langue choisie';
-      const contactName = (state.settings.contactName || '').trim();
-      const template = (state.settings.chatgptPromptTemplate || defaultState.settings.chatgptPromptTemplate).trim();
-      const prompt = template
-        .replaceAll('{prenom}', contactName || 'ma femme de ménage')
-        .replaceAll('{langue}', selectedLanguage)
-        .replaceAll('{message}', text);
-
-      const url = `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
-      window.open(url, '_blank');
-    });
-
-    openWhatsappBtn.addEventListener('click', () => {
-      const phone = normalizePhone(state.settings.contactPhone);
-      if (!phone) {
-        alert('Merci de renseigner le contact WhatsApp dans les paramètres.');
-        setCurrentPage('settings');
-        return;
-      }
-      const text = (translatedMessageOutput.value || contactMessageInput.value || '').trim();
-      if (!text) {
-        alert('Merci de rédiger un message avant d’ouvrir WhatsApp.');
-        return;
-      }
-      const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank');
-    });
-
-    function openAddMenu() {
-      addMenuModal.classList.remove('hidden');
-      document.getElementById('fabShell')?.classList.add('open');
-    }
-
-    function closeAddMenuSheet() {
-      addMenuModal.classList.add('hidden');
-      document.getElementById('fabShell')?.classList.remove('open');
-    }
-
-    addMenuBtn.addEventListener('click', openAddMenu);
-    addSessionQuick.addEventListener('click', () => {
-      closeAddMenuSheet();
-      setCurrentPage('session');
-    });
-    addPaymentQuick.addEventListener('click', () => {
-      closeAddMenuSheet();
-      setCurrentPage('payment');
-    });
-    closeAddMenu.addEventListener('click', closeAddMenuSheet);
-    addMenuModal.addEventListener('click', (event) => {
-      if (event.target === addMenuModal) closeAddMenuSheet();
-    });
-
-    sessionDateInput.value = todayISO();
-    paymentDateInput.value = todayISO();
+    els.sessionDateInput.value = todayISO();
+    els.paymentDateInput.value = todayISO();
     render();
   </script>
 </body>
