@@ -204,6 +204,11 @@
         <section class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 shadow-soft space-y-4">
           <div>
             <label for="contactMessageInput" class="block text-sm font-medium mb-1">Message en français</label>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <button type="button" class="quick-message-btn rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs font-medium" data-message="décaler la session à la semaine prochaine">Décaler</button>
+              <button type="button" class="quick-message-btn rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs font-medium" data-message="annuler la session de mercredi">Annuler</button>
+              <button type="button" class="quick-message-btn rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs font-medium" data-message="lui préciser les tâches à faire aujourd’hui : changer les draps, passer l’aspirateur et étendre le linge">Tâches</button>
+            </div>
             <textarea id="contactMessageInput" rows="5" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Écrivez votre message..."></textarea>
           </div>
           <div class="grid grid-cols-2 gap-3">
@@ -253,6 +258,11 @@
                 <option value="ro">Roumain</option>
               </select>
             </div>
+            <div>
+              <label for="chatgptPromptTemplateInput" class="block text-sm font-medium mb-1">Prompt ChatGPT personnalisé</label>
+              <textarea id="chatgptPromptTemplateInput" rows="5" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Utilisez les variables {prenom}, {langue}, {message}"></textarea>
+              <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Variables disponibles : <span class="font-medium">{prenom}</span>, <span class="font-medium">{langue}</span>, <span class="font-medium">{message}</span></p>
+            </div>
             <p class="text-xs text-slate-500 dark:text-slate-400">Le montant d’une session reste figé avec le taux horaire enregistré au moment de la saisie.</p>
           </div>
         </section>
@@ -299,6 +309,7 @@
         contactPhone: '',
         contactName: '',
         translationLanguage: 'es',
+        chatgptPromptTemplate: 'Prépare un message simple, poli et naturel à ma femme de ménage {prenom} en {langue} : {message}',
       },
       ui: {
         currentPage: 'dashboard',
@@ -325,6 +336,7 @@
     const defaultDurationInput = document.getElementById('defaultDurationInput');
     const contactPhoneInput = document.getElementById('contactPhoneInput');
     const contactNameInput = document.getElementById('contactNameInput');
+    const chatgptPromptTemplateInput = document.getElementById('chatgptPromptTemplateInput');
     const translationLanguageSelect = document.getElementById('translationLanguageSelect');
 
     const quickAddTodayBtn = document.getElementById('quickAddTodayBtn');
@@ -344,6 +356,7 @@
     const contactMessageInput = document.getElementById('contactMessageInput');
     const translatedMessageOutput = document.getElementById('translatedMessageOutput');
     const openGeminiBtn = document.getElementById('openGeminiBtn');
+    const quickMessageButtons = Array.from(document.querySelectorAll('.quick-message-btn'));
     const openWhatsappBtn = document.getElementById('openWhatsappBtn');
 
     function loadState() {
@@ -358,6 +371,7 @@
             contactPhone: String(parsed?.settings?.contactPhone ?? defaultState.settings.contactPhone),
             contactName: String(parsed?.settings?.contactName ?? defaultState.settings.contactName),
             translationLanguage: String(parsed?.settings?.translationLanguage ?? defaultState.settings.translationLanguage),
+            chatgptPromptTemplate: String(parsed?.settings?.chatgptPromptTemplate ?? defaultState.settings.chatgptPromptTemplate),
           },
           ui: {
             currentPage: parsed?.ui?.currentPage ?? defaultState.ui.currentPage,
@@ -436,6 +450,7 @@
       contactPhoneInput.value = state.settings.contactPhone;
       contactNameInput.value = state.settings.contactName || ''; 
       translationLanguageSelect.value = state.settings.translationLanguage;
+      chatgptPromptTemplateInput.value = state.settings.chatgptPromptTemplate || ''; 
       sessionRateInput.value = state.settings.hourlyRate;
       sessionDateInput.value = sessionDateInput.value || todayISO();
       paymentDateInput.value = paymentDateInput.value || todayISO();
@@ -643,6 +658,11 @@
       saveState();
     });
 
+    chatgptPromptTemplateInput.addEventListener('change', () => {
+      state.settings.chatgptPromptTemplate = chatgptPromptTemplateInput.value.trim() || defaultState.settings.chatgptPromptTemplate;
+      saveState();
+    });
+
     durationButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         state.ui.selectedDurationMode = 'preset';
@@ -702,7 +722,13 @@
       setCurrentPage('history');
     });
 
-    openGeminiBtn.addEventListener('click', () => {
+    quickMessageButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    contactMessageInput.value = btn.dataset.message || '';
+  });
+});
+
+openGeminiBtn.addEventListener('click', () => {
   const text = contactMessageInput.value.trim();
 
   if (!text) {
@@ -713,7 +739,11 @@
   const selectedLanguage = translationLanguageSelect.options[translationLanguageSelect.selectedIndex]?.text?.toLowerCase() || 'la langue choisie';
 
   const contactName = (state.settings.contactName || '').trim();
-  const prompt = `Prépare un message simple, poli et naturel à ma femme de ménage${contactName ? ' ' + contactName : ''} en ${selectedLanguage} : ${text}`;
+  const template = (state.settings.chatgptPromptTemplate || defaultState.settings.chatgptPromptTemplate).trim();
+  const prompt = template
+    .replaceAll('{prenom}', contactName || 'ma femme de ménage')
+    .replaceAll('{langue}', selectedLanguage)
+    .replaceAll('{message}', text);
 
   const url = `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
 
