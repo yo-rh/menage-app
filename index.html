@@ -207,7 +207,7 @@
             <textarea id="contactMessageInput" rows="5" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Écrivez votre message..."></textarea>
           </div>
           <div class="grid grid-cols-2 gap-3">
-            <button id="translateMessageBtn" class="rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 px-4 py-3 font-medium">Traduire</button>
+            <button id="openGeminiBtn" class="rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 px-4 py-3 font-medium">Traduire</button>
             <button id="openWhatsappBtn" class="rounded-2xl bg-apple-600 hover:bg-apple-700 text-white px-4 py-3 font-medium">Ouvrir WhatsApp</button>
           </div>
           <div>
@@ -337,7 +337,7 @@
 
     const contactMessageInput = document.getElementById('contactMessageInput');
     const translatedMessageOutput = document.getElementById('translatedMessageOutput');
-    const translateMessageBtn = document.getElementById('translateMessageBtn');
+    const openGeminiBtn = document.getElementById('openGeminiBtn');
     const openWhatsappBtn = document.getElementById('openWhatsappBtn');
 
     function loadState() {
@@ -689,15 +689,20 @@
       setCurrentPage('history');
     });
 
-    translateMessageBtn.addEventListener('click', () => {
-      const text = contactMessageInput.value.trim();
-      if (!text) {
-        alert('Merci de saisir un message à traduire.');
-        return;
-      }
-      translatedMessageOutput.value = fakeTranslateText(text);
-      window.open(buildTranslationUrl(text), '_blank');
-    });
+    openGeminiBtn.addEventListener('click', () => {
+  const text = contactMessageInput.value.trim();
+
+  if (!text) {
+    alert('Merci de rédiger un message.');
+    return;
+  }
+
+  const prompt = `Prépare un message à ma femme de ménage pour lui dire que ${text}`;
+
+  const url = `https://gemini.google.com/app?prompt=${encodeURIComponent(prompt)}`;
+
+  window.open(url, '_blank');
+});
 
     openWhatsappBtn.addEventListener('click', () => {
       const phone = normalizePhone(state.settings.contactPhone);
