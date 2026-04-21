@@ -30,9 +30,39 @@
     html { -webkit-tap-highlight-color: transparent; }
     body { font-feature-settings: "ss01" on, "cv01" on, "cv11" on; }
     input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.8; cursor: pointer; }
-    .safe-bottom { padding-bottom: max(5.5rem, calc(env(safe-area-inset-bottom) + 5rem)); }
+    .safe-bottom { padding-bottom: max(7rem, calc(env(safe-area-inset-bottom) + 6.5rem)); }
     .page { display: none; }
     .page.active { display: block; }
+    .fab-shell {
+      position: relative;
+      width: 4rem;
+      height: 4rem;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.88);
+      color: white;
+      backdrop-filter: blur(18px) saturate(180%);
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.28), 0 6px 14px rgba(15, 23, 42, 0.18);
+      transform: translateY(-1rem);
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    }
+    .fab-shell:active {
+      transform: translateY(-0.85rem) scale(0.97);
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.22);
+    }
+    .fab-shell.open svg {
+      transform: rotate(45deg);
+    }
+    .fab-shell svg {
+      transition: transform 180ms ease;
+    }
+    .fab-backdrop {
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen">
@@ -270,34 +300,72 @@
     </main>
   </div>
 
-  <nav class="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl">
-    <div class="max-w-md mx-auto grid grid-cols-6 px-2 py-2" id="bottomNav">
-      <button data-page="dashboard" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955a1.125 1.125 0 0 1 1.591 0L21.75 12M4.5 9.75V19.5A1.5 1.5 0 0 0 6 21h3.75v-5.25c0-.414.336-.75.75-.75h3c.414 0 .75.336.75.75V21H18a1.5 1.5 0 0 0 1.5-1.5V9.75" /></svg>
-        Accueil
-      </button>
-      <button data-page="session" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-        Session
-      </button>
-      <button data-page="payment" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5m-18 0h16.5A1.5 1.5 0 0 1 21.75 9.75v8.25a1.5 1.5 0 0 1-1.5 1.5H3.75a1.5 1.5 0 0 1-1.5-1.5V9.75a1.5 1.5 0 0 1 1.5-1.5Zm12 4.5h3" /></svg>
-        Paiement
-      </button>
-      <button data-page="history" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-        Historique
-      </button>
-      <button data-page="contact" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3h5.25m-7.5 8.25h13.5A2.25 2.25 0 0 0 21 17.25V6.75A2.25 2.25 0 0 0 18.75 4.5H5.25A2.25 2.25 0 0 0 3 6.75v10.5A2.25 2.25 0 0 0 5.25 19.5Z" /></svg>
-        Contacter
-      </button>
-      <button data-page="settings" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 1 0 15 0 7.5 7.5 0 0 0-15 0ZM12 8.25v3.75l2.25 2.25" /></svg>
-        Réglages
-      </button>
+  <nav class="fixed bottom-0 left-0 right-0 z-40 pointer-events-none">
+    <div class="max-w-md mx-auto px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      <div class="pointer-events-auto rounded-[28px] border border-slate-200/80 dark:border-slate-800/80 bg-white/85 dark:bg-slate-950/85 backdrop-blur-xl shadow-soft px-2 py-2">
+        <div class="grid grid-cols-5 items-end text-[11px]">
+          <button data-page="dashboard" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 font-medium text-slate-500 dark:text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.9" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9.776 10.94 4.2a1.75 1.75 0 0 1 2.12 0l7.19 5.576a1.75 1.75 0 0 1 .675 1.383v7.09A1.75 1.75 0 0 1 19.175 20H4.825a1.75 1.75 0 0 1-1.75-1.75v-7.09c0-.54.249-1.05.675-1.383Z" /></svg>
+            <span>Accueil</span>
+          </button>
+
+          <button data-page="history" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 font-medium text-slate-500 dark:text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.9" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l3.5 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+            <span>Historique</span>
+          </button>
+
+          <div class="flex justify-center">
+            <button id="addMenuBtn" aria-label="Ajouter" class="pointer-events-auto">
+              <div id="fabShell" class="fab-shell">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5.25v13.5M18.75 12H5.25" /></svg>
+              </div>
+            </button>
+          </div>
+
+          <button data-page="contact" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 font-medium text-slate-500 dark:text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.9" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 10.5h9m-9 3h5.25M6.375 3.75h11.25c1.036 0 1.875.84 1.875 1.875v8.25c0 1.036-.84 1.875-1.875 1.875h-6.22a1.875 1.875 0 0 0-1.326.55l-2.8 2.8c-.59.59-1.603.172-1.603-.663V15.75H6.375A1.875 1.875 0 0 1 4.5 13.875v-8.25c0-1.036.84-1.875 1.875-1.875Z" /></svg>
+            <span>Contacter</span>
+          </button>
+
+          <button data-page="settings" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 font-medium text-slate-500 dark:text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317a1 1 0 0 1 1.35-.936l1.8.8a1 1 0 0 0 .95 0l1.8-.8a1 1 0 0 1 1.35.936l.2 2a1 1 0 0 0 .7.85l1.9.6a1 1 0 0 1 .6 1.3l-.8 1.8a1 1 0 0 0 0 .95l.8 1.8a1 1 0 0 1-.6 1.3l-1.9.6a1 1 0 0 0-.7.85l-.2 2a1 1 0 0 1-1.35.936l-1.8-.8a1 1 0 0 0-.95 0l-1.8.8a1 1 0 0 1-1.35-.936l-.2-2a1 1 0 0 0-.7-.85l-1.9-.6a1 1 0 0 1-.6-1.3l.8-1.8a1 1 0 0 0 0-.95l-.8-1.8a1 1 0 0 1 .6-1.3l1.9-.6a1 1 0 0 0 .7-.85l.2-2Z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            <span>Réglages</span>
+          </button>
+        </div>
+      </div>
     </div>
   </nav>
+
+  <div id="addMenuModal" class="hidden fixed inset-0 z-50 fab-backdrop bg-slate-950/30 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-20 flex items-end justify-center">
+    <div class="w-full max-w-md rounded-[28px] border border-slate-200/80 dark:border-slate-800/80 bg-white/88 dark:bg-slate-950/88 backdrop-blur-2xl shadow-2xl p-4">
+      <div class="mx-auto mb-4 h-1.5 w-12 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+      <div class="space-y-3">
+        <button id="addSessionQuick" class="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/90 px-4 py-4 text-left flex items-center gap-3">
+          <span class="rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300 p-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.9" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3.75 8.25h16.5M5.25 21h13.5A1.5 1.5 0 0 0 20.25 19.5v-12A1.5 1.5 0 0 0 18.75 6H5.25a1.5 1.5 0 0 0-1.5 1.5v12A1.5 1.5 0 0 0 5.25 21Z" /></svg>
+          </span>
+          <span>
+            <span class="block font-medium">Ajouter une session</span>
+            <span class="block text-sm text-slate-500 dark:text-slate-400">Enregistrer des heures de ménage</span>
+          </span>
+        </button>
+        <button id="addPaymentQuick" class="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/90 px-4 py-4 text-left flex items-center gap-3">
+          <span class="rounded-2xl bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300 p-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.9" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5m-18 0h16.5A1.5 1.5 0 0 1 21.75 9.75v8.25a1.5 1.5 0 0 1-1.5 1.5H3.75a1.5 1.5 0 0 1-1.5-1.5V9.75a1.5 1.5 0 0 1 1.5-1.5Zm12 4.5h3" /></svg>
+          </span>
+          <span>
+            <span class="block font-medium">Ajouter un paiement</span>
+            <span class="block text-sm text-slate-500 dark:text-slate-400">Déduire un montant du solde</span>
+          </span>
+        </button>
+        <button id="closeAddMenu" class="w-full rounded-2xl px-4 py-3 text-sm font-medium text-slate-500 dark:text-slate-400">Fermer</button>
+      </div>
+    </div>
+  </div>
+  </div>
 
   <script>
     const STORAGE_KEY = 'employeMaisonAppV2';
@@ -358,6 +426,11 @@
     const openGeminiBtn = document.getElementById('openGeminiBtn');
     const quickMessageButtons = Array.from(document.querySelectorAll('.quick-message-btn'));
     const openWhatsappBtn = document.getElementById('openWhatsappBtn');
+    const addMenuBtn = document.getElementById('addMenuBtn');
+    const addMenuModal = document.getElementById('addMenuModal');
+    const addSessionQuick = document.getElementById('addSessionQuick');
+    const addPaymentQuick = document.getElementById('addPaymentQuick');
+    const closeAddMenu = document.getElementById('closeAddMenu');
 
     function loadState() {
       try {
@@ -439,7 +512,7 @@
       document.getElementById(`page-${page}`).classList.add('active');
       document.querySelectorAll('.nav-btn').forEach(btn => {
         const active = btn.dataset.page === page;
-        btn.className = `nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-medium ${active ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'text-slate-500 dark:text-slate-400'}`;
+        btn.className = `nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 font-medium text-[11px] ${active ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`;
       });
       saveState();
     }
@@ -723,32 +796,30 @@
     });
 
     quickMessageButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    contactMessageInput.value = btn.dataset.message || '';
-  });
-});
+      btn.addEventListener('click', () => {
+        contactMessageInput.value = btn.dataset.message || '';
+      });
+    });
 
-openGeminiBtn.addEventListener('click', () => {
-  const text = contactMessageInput.value.trim();
+    openGeminiBtn.addEventListener('click', () => {
+      const text = contactMessageInput.value.trim();
 
-  if (!text) {
-    alert('Merci de rédiger un message.');
-    return;
-  }
+      if (!text) {
+        alert('Merci de rédiger un message.');
+        return;
+      }
 
-  const selectedLanguage = translationLanguageSelect.options[translationLanguageSelect.selectedIndex]?.text?.toLowerCase() || 'la langue choisie';
+      const selectedLanguage = translationLanguageSelect.options[translationLanguageSelect.selectedIndex]?.text?.toLowerCase() || 'la langue choisie';
+      const contactName = (state.settings.contactName || '').trim();
+      const template = (state.settings.chatgptPromptTemplate || defaultState.settings.chatgptPromptTemplate).trim();
+      const prompt = template
+        .replaceAll('{prenom}', contactName || 'ma femme de ménage')
+        .replaceAll('{langue}', selectedLanguage)
+        .replaceAll('{message}', text);
 
-  const contactName = (state.settings.contactName || '').trim();
-  const template = (state.settings.chatgptPromptTemplate || defaultState.settings.chatgptPromptTemplate).trim();
-  const prompt = template
-    .replaceAll('{prenom}', contactName || 'ma femme de ménage')
-    .replaceAll('{langue}', selectedLanguage)
-    .replaceAll('{message}', text);
-
-  const url = `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
-
-  window.open(url, '_blank');
-});
+      const url = `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
+      window.open(url, '_blank');
+    });
 
     openWhatsappBtn.addEventListener('click', () => {
       const phone = normalizePhone(state.settings.contactPhone);
@@ -764,6 +835,30 @@ openGeminiBtn.addEventListener('click', () => {
       }
       const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank');
+    });
+
+    function openAddMenu() {
+      addMenuModal.classList.remove('hidden');
+      document.getElementById('fabShell')?.classList.add('open');
+    }
+
+    function closeAddMenuSheet() {
+      addMenuModal.classList.add('hidden');
+      document.getElementById('fabShell')?.classList.remove('open');
+    }
+
+    addMenuBtn.addEventListener('click', openAddMenu);
+    addSessionQuick.addEventListener('click', () => {
+      closeAddMenuSheet();
+      setCurrentPage('session');
+    });
+    addPaymentQuick.addEventListener('click', () => {
+      closeAddMenuSheet();
+      setCurrentPage('payment');
+    });
+    closeAddMenu.addEventListener('click', closeAddMenuSheet);
+    addMenuModal.addEventListener('click', (event) => {
+      if (event.target === addMenuModal) closeAddMenuSheet();
     });
 
     sessionDateInput.value = todayISO();
