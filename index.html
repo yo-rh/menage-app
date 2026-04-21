@@ -239,6 +239,14 @@
               <input id="contactPhoneInput" type="tel" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Ex : 33612345678" />
             </div>
             <div>
+              <label for="contactNameInput" class="block text-sm font-medium mb-1">Prénom de la femme de ménage</label>
+              <input id="contactNameInput" type="text" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none
+            </div>
+            <div>
+              <label for="contactNameInput" class="block text-sm font-medium mb-1">Prénom de la femme de ménage</label>
+              <input id="contactNameInput" type="text" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Ex : Diana" />
+            </div>
+            <div>
               <label for="translationLanguageSelect" class="block text-sm font-medium mb-1">Langue de traduction</label>
               <select id="translationLanguageSelect" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500">
                 <option value="es">Espagnol</option>
@@ -279,7 +287,7 @@
         Contacter
       </button>
       <button data-page="settings" class="nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 1 0 15 0 7.5 7.5 0 0 0-15 0ZM12 8.25v3.75l2.25 2.25" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5"><path stroke-linec-linejoin="round" d="M4.5 12a7.5 7.5 0 1 0 15 0 7.5 7.5 0 0 0-15 0ZM12 8.25v3.75l2.25 2.25" /></svg>
         Réglages
       </button>
     </div>
@@ -293,6 +301,7 @@
         hourlyRate: 12,
         defaultDuration: 2.5,
         contactPhone: '',
+        contactName: '',
         translationLanguage: 'es',
       },
       ui: {
@@ -312,13 +321,13 @@
     const summarySessions = document.getElementById('summarySessions');
     const summaryPayments = document.getElementById('summaryPayments');
     const lastSessionDisplay = document.getElementById('lastSessionDisplay');
-    const lastPaymentDisplay = document.getElementById('lastPaymentDisplay');
-    const historyList = document.getElementById('historyList');
+    const lastPaymentDisplay = document.getElementById('historyList');
     const exportCsvBtn = document.getElementById('exportCsvBtn');
 
     const hourlyRateInput = document.getElementById('hourlyRateInput');
     const defaultDurationInput = document.getElementById('defaultDurationInput');
     const contactPhoneInput = document.getElementById('contactPhoneInput');
+    const contactNameInput = document.getElementById('contactNameInput');
     const translationLanguageSelect = document.getElementById('translationLanguageSelect');
 
     const quickAddTodayBtn = document.getElementById('quickAddTodayBtn');
@@ -332,8 +341,7 @@
     const durationButtons = Array.from(document.querySelectorAll('.duration-option'));
 
     const paymentDateInput = document.getElementById('paymentDateInput');
-    const paymentAmountInput = document.getElementById('paymentAmountInput');
-    const savePaymentBtn = document.getElementById('savePaymentBtn');
+    const paymentAmountInput = document.getElementById('paymentAmountInpaymentBtn');
 
     const contactMessageInput = document.getElementById('contactMessageInput');
     const translatedMessageOutput = document.getElementById('translatedMessageOutput');
@@ -342,14 +350,14 @@
 
     function loadState() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return structuredClone(defaultState);
+        const raw =
         const parsed = JSON.parse(raw);
         return {
           settings: {
             hourlyRate: Number(parsed?.settings?.hourlyRate ?? defaultState.settings.hourlyRate),
             defaultDuration: Number(parsed?.settings?.defaultDuration ?? defaultState.settings.defaultDuration),
             contactPhone: String(parsed?.settings?.contactPhone ?? defaultState.settings.contactPhone),
+            contactName: String(parsed?.settings?.contactName ?? defaultState.settings.contactName),
             translationLanguage: String(parsed?.settings?.translationLanguage ?? defaultState.settings.translationLanguage),
           },
           ui: {
@@ -423,10 +431,10 @@
       saveState();
     }
 
-    function renderSettings() {
-      hourlyRateInput.value = state.settings.hourlyRate;
+    e = state.settings.hourlyRate;
       defaultDurationInput.value = state.settings.defaultDuration;
       contactPhoneInput.value = state.settings.contactPhone;
+      contactNameInput.value = state.settings.contactName || ''; 
       translationLanguageSelect.value = state.settings.translationLanguage;
       sessionRateInput.value = state.settings.hourlyRate;
       sessionDateInput.value = sessionDateInput.value || todayISO();
@@ -616,12 +624,13 @@
     });
 
     defaultDurationInput.addEventListener('change', () => {
-      state.settings.defaultDuration = Number(Math.max(0, Number(defaultDurationInput.value || 0)).toFixed(2));
-      render();
+      state.settings.defaultDuration , () => {
+      state.settings.contactPhone = contactPhoneInput.value.trim();
+      saveState();
     });
 
-    contactPhoneInput.addEventListener('change', () => {
-      state.settings.contactPhone = contactPhoneInput.value.trim();
+    contactNameInput.addEventListener('change', () => {
+      state.settings.contactName = contactNameInput.value.trim();
       saveState();
     });
 
@@ -697,9 +706,9 @@
     return;
   }
 
-  const prompt = `Prépare un message à ma femme de ménage pour lui dire que ${text}`;
+  const selectedLanguage = translationLanguag  const prompt = `Prépare un message simple, poli et naturel à ma femme de ménage${contactName ? ' ' + contactName : ''} en ${selectedLanguage} : ${text}`;
 
-  const url = `https://gemini.google.com/app?prompt=${encodeURIComponent(prompt)}`;
+  const url = `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
 
   window.open(url, '_blank');
 });
