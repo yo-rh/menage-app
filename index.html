@@ -280,7 +280,7 @@
       <section id="page-contact" class="page space-y-4">
         <div>
           <h2 class="text-xl font-semibold tracking-tight">Contacter</h2>
-          <p class="text-sm text-slate-500 dark:text-slate-400">Préparez un message et ouvrez ChatGPT ou WhatsApp.</p>
+          <p class="text-sm text-slate-500 dark:text-slate-400">Préparez un message et envoyez-le directement.</p>
         </div>
         <section class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 shadow-soft space-y-4">
           <div>
@@ -292,13 +292,18 @@
             </div>
             <textarea id="contactMessageInput" rows="5" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Écrivez votre message..."></textarea>
           </div>
-          <div class="grid grid-cols-2 gap-3">
-            <button id="openChatgptBtn" class="rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 px-4 py-3 font-medium">Ouvrir ChatGPT</button>
-            <button id="openWhatsappBtn" class="rounded-2xl bg-apple-600 hover:bg-apple-700 text-white px-4 py-3 font-medium">WhatsApp</button>
+
+          <div class="grid grid-cols-3 gap-3">
+            <button id="openChatgptBtn" class="rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 px-4 py-3 font-medium text-sm">ChatGPT</button>
+            <button id="translateMessageBtn" class="rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-3 font-medium text-sm">Traduire</button>
+            <button id="openWhatsappBtn" class="rounded-2xl bg-apple-600 hover:bg-apple-700 text-white px-4 py-3 font-medium text-sm">WhatsApp</button>
           </div>
+
+          <p id="translateStatusText" class="hidden text-sm text-slate-500 dark:text-slate-400">Traduction en cours...</p>
+
           <div>
             <label for="translatedMessageOutput" class="block text-sm font-medium mb-1">Message prêt à envoyer</label>
-            <textarea id="translatedMessageOutput" rows="6" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none" placeholder="La version finale peut être collée ici..."></textarea>
+            <textarea id="translatedMessageOutput" rows="6" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none" placeholder="La version finale apparaîtra ici..."></textarea>
           </div>
         </section>
       </section>
@@ -503,6 +508,8 @@
       contactMessageInput: byId('contactMessageInput'),
       translatedMessageOutput: byId('translatedMessageOutput'),
       openChatgptBtn: byId('openChatgptBtn'),
+      translateMessageBtn: byId('translateMessageBtn'),
+      translateStatusText: byId('translateStatusText'),
       openWhatsappBtn: byId('openWhatsappBtn'),
       addMenuBtn: byId('addMenuBtn'),
       addMenuModal: byId('addMenuModal'),
@@ -664,22 +671,6 @@
       };
     }
 
-    function mergeEntries(localEntries, remoteEntries) {
-      const map = new Map();
-      localEntries.concat(remoteEntries).forEach((entry) => {
-        if (!entry || !entry.id) return;
-        const existing = map.get(entry.id);
-        if (!existing) {
-          map.set(entry.id, entry);
-          return;
-        }
-        const existingCreated = String(existing.createdAt || '');
-        const incomingCreated = String(entry.createdAt || '');
-        map.set(entry.id, incomingCreated > existingCreated ? entry : existing);
-      });
-      return Array.from(map.values());
-    }
-
     async function fetchRemoteEntries() {
       const syncKey = getSyncKey();
       if (!state.settings.syncUrl || !syncKey) {
@@ -737,15 +728,57 @@
       return data;
     }
 
+    async function translateMessageViaAppsScript() {
+      const syncKey = getSyncKey();
+      if (!state.settings.syncUrl || !syncKey) {
+        throw new Error("Merci de renseigner l'URL Apps Script et la clé partagée.");
+      }
+
+      const message = (els.contactMessageInput && els.contactMessageInput.value.trim()) || '';
+      if (!message) {
+        throw new Error('Merci de rédiger un message à traduire.');
+      }
+
+      const payload = JSON.stringify({
+        key: syncKey,
+        action: 'translate',
+        message: message,
+        language: state.settings.translationLanguage || 'es',
+        contactName: state.settings.contactName || ''
+      });
+
+      const response = await fetch(state.settings.syncUrl, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'payload=' + encodeURIComponent(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur de traduction (HTTP ' + response.status + ').');
+      }
+
+      const data = await response.json();
+      if (!data || data.ok !== true || !data.translatedText) {
+        throw new Error((data && data.error) || 'Réponse de traduction invalide.');
+      }
+
+      return data.translatedText;
+    }
+
     async function syncBidirectional(showSuccess) {
       try {
         setSyncStatus('Synchronisation en cours...', false);
+
+        const localSnapshot = state.entries.map(entryToSyncRow);
+        await pushEntries(localSnapshot);
+
         const remoteEntries = await fetchRemoteEntries();
-        const merged = mergeEntries(state.entries, remoteEntries);
-        state.entries = merged;
+        state.entries = remoteEntries;
+
         saveState();
         renderFull(sortedEntries());
-        await pushEntries(merged);
+
         setSyncStatus('Synchronisé le ' + new Date().toLocaleString('fr-FR'), false);
         if (showSuccess) showToast('✅ Synchronisation terminée.');
       } catch (error) {
@@ -758,7 +791,7 @@
       try {
         setSyncStatus('Récupération en cours...', false);
         const remoteEntries = await fetchRemoteEntries();
-        state.entries = mergeEntries(state.entries, remoteEntries);
+        state.entries = remoteEntries;
         saveState();
         renderFull(sortedEntries());
         setSyncStatus('Données récupérées le ' + new Date().toLocaleString('fr-FR'), false);
@@ -1219,6 +1252,35 @@
           .replaceAll('{message}', text);
 
         window.open('https://chatgpt.com/?q=' + encodeURIComponent(prompt), '_blank');
+      });
+    }
+
+    if (els.translateMessageBtn) {
+      els.translateMessageBtn.addEventListener('click', async () => {
+        try {
+          if (els.translateStatusText) {
+            els.translateStatusText.textContent = 'Traduction en cours...';
+            els.translateStatusText.classList.remove('hidden');
+          }
+          els.translateMessageBtn.disabled = true;
+          els.translateMessageBtn.classList.add('opacity-60');
+
+          const translatedText = await translateMessageViaAppsScript();
+
+          if (els.translatedMessageOutput) {
+            els.translatedMessageOutput.value = translatedText;
+          }
+
+          showToast('✅ Message traduit.');
+        } catch (error) {
+          alert(error.message || 'Erreur de traduction.');
+        } finally {
+          if (els.translateStatusText) {
+            els.translateStatusText.classList.add('hidden');
+          }
+          els.translateMessageBtn.disabled = false;
+          els.translateMessageBtn.classList.remove('opacity-60');
+        }
       });
     }
 
