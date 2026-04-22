@@ -60,7 +60,6 @@
     .fab-shell.open span { transform: rotate(45deg); }
     .fab-shell span { transition: transform .18s ease; }
 
-    /* ── Toast ── */
     #toast {
       position: fixed;
       bottom: 6.5rem;
@@ -93,10 +92,8 @@
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen">
 
-  <!-- Toast de confirmation -->
   <div id="toast"></div>
 
-  <!-- Modale de confirmation suppression -->
   <div id="confirmModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center px-6 bg-slate-950/40 backdrop-blur-sm">
     <div class="w-full max-w-xs rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl p-5 space-y-4">
       <div class="text-center space-y-1">
@@ -123,7 +120,6 @@
     </header>
 
     <main>
-      <!-- DASHBOARD -->
       <section id="page-dashboard" class="page active space-y-4">
         <section class="rounded-3xl bg-gradient-to-br from-apple-500 to-apple-700 text-white p-5 shadow-soft">
           <div class="flex items-center justify-between mb-3 gap-3">
@@ -174,7 +170,6 @@
         </section>
       </section>
 
-      <!-- SESSION -->
       <section id="page-session" class="page space-y-4">
         <div>
           <h2 class="text-xl font-semibold tracking-tight">Ajouter une session</h2>
@@ -210,7 +205,6 @@
         </section>
       </section>
 
-      <!-- PAIEMENT -->
       <section id="page-payment" class="page space-y-4">
         <div>
           <h2 class="text-xl font-semibold tracking-tight">Ajouter un paiement</h2>
@@ -229,7 +223,6 @@
         </section>
       </section>
 
-      <!-- HISTORIQUE -->
       <section id="page-history" class="page space-y-4">
         <div>
           <h2 class="text-xl font-semibold tracking-tight">Historique des sessions</h2>
@@ -243,7 +236,6 @@
         </section>
       </section>
 
-      <!-- CONTACT -->
       <section id="page-contact" class="page space-y-4">
         <div>
           <h2 class="text-xl font-semibold tracking-tight">Contacter</h2>
@@ -270,7 +262,6 @@
         </section>
       </section>
 
-      <!-- RÉGLAGES -->
       <section id="page-settings" class="page overflow-y-auto pb-32 space-y-4">
         <div>
           <h2 class="text-xl font-semibold tracking-tight">Paramétrage</h2>
@@ -347,7 +338,6 @@
     </main>
   </div>
 
-  <!-- NAV -->
   <nav class="fixed bottom-0 left-0 right-0 z-40 pointer-events-none">
     <div class="max-w-md mx-auto px-4 pb-[max(.75rem,env(safe-area-inset-bottom))]">
       <div class="pointer-events-auto rounded-[28px] border border-slate-200/80 dark:border-slate-800/80 bg-white/85 dark:bg-slate-950/85 backdrop-blur-xl shadow-soft px-2 py-2">
@@ -362,7 +352,6 @@
     </div>
   </nav>
 
-  <!-- MODAL AJOUT -->
   <div id="addMenuModal" class="hidden fixed inset-0 z-50 bg-slate-950/30 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-20 flex items-end justify-center">
     <div class="w-full max-w-md rounded-[28px] border border-slate-200/80 dark:border-slate-800/80 bg-white/88 dark:bg-slate-950/88 backdrop-blur-2xl shadow-2xl p-4">
       <div class="mx-auto mb-4 h-1.5 w-12 rounded-full bg-slate-300 dark:bg-slate-700"></div>
@@ -377,9 +366,6 @@
   <script>
     'use strict';
 
-    // ─────────────────────────────────────────────
-    // CONSTANTES & ÉTAT
-    // ─────────────────────────────────────────────
     const STORAGE_KEY = 'employeMaisonAppV10';
 
     const defaultState = {
@@ -389,7 +375,7 @@
         contactPhone: '',
         contactName: '',
         translationLanguage: 'es',
-        chatgptPromptTemplate: "Prepare un message simple, poli et naturel a ma femme de menage {prenom} en {langue} : {message}",
+        chatgptPromptTemplate: 'Prepare un message simple, poli et naturel a ma femme de menage {prenom} en {langue} : {message}',
         syncUrl: '',
         syncKey: ''
       },
@@ -435,14 +421,17 @@
 
     let state = loadState();
 
-    // Clé sync persistée dans localStorage via state.settings.syncKey
-    function getSyncKey() { return state.settings.syncKey || ''; }
-    function setSyncKey(value) { state.settings.syncKey = value.trim(); }
+    function getSyncKey() {
+      return state.settings.syncKey || '';
+    }
 
-    // ─────────────────────────────────────────────
-    // RÉFÉRENCES DOM
-    // ─────────────────────────────────────────────
-    function byId(id) { return document.getElementById(id); }
+    function setSyncKey(value) {
+      state.settings.syncKey = value.trim();
+    }
+
+    function byId(id) {
+      return document.getElementById(id);
+    }
 
     const els = {
       balanceDisplay: byId('balanceDisplay'),
@@ -491,19 +480,12 @@
     const durationButtons = Array.from(document.querySelectorAll('.duration-option'));
     const quickMessageButtons = Array.from(document.querySelectorAll('.quick-message-btn'));
 
-    // ─────────────────────────────────────────────
-    // UTILITAIRES
-    // ─────────────────────────────────────────────
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
 
     function euro(value) {
       return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(Number(value || 0));
-    }
-
-    function formatDate(value) {
-      return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(String(value) + 'T12:00:00'));
     }
 
     function todayISO() {
@@ -516,15 +498,61 @@
       return new Date().toISOString();
     }
 
-    // [BUG #1] Apostrophes : toutes les chaînes JS utilisent des guillemets doubles
-    // [UX #2] Validation longueur minimale du numéro
+    function toISODateOnly(value) {
+      if (value == null || value === '') return todayISO();
+
+      if (typeof value === 'string') {
+        const trimmed = value.trim();
+
+        if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+          return trimmed;
+        }
+
+        const isoMatch = trimmed.match(/^(\d{4}-\d{2}-\d{2})T/);
+        if (isoMatch) {
+          return isoMatch[1];
+        }
+
+        const d = new Date(trimmed);
+        if (!Number.isNaN(d.getTime())) {
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          return `${y}-${m}-${day}`;
+        }
+      }
+
+      if (typeof value === 'number') {
+        const d = new Date(value);
+        if (!Number.isNaN(d.getTime())) {
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          return `${y}-${m}-${day}`;
+        }
+      }
+
+      return todayISO();
+    }
+
+    function formatDate(value) {
+      const iso = toISODateOnly(value);
+      const d = new Date(`${iso}T12:00:00`);
+      if (Number.isNaN(d.getTime())) return iso;
+      return new Intl.DateTimeFormat('fr-FR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      }).format(d);
+    }
+
     function normalizePhone(value) {
       let phone = String(value || '').replace(/[^\d+]/g, '').trim();
       if (phone.startsWith('+')) phone = phone.slice(1);
       if (phone.startsWith('00')) phone = phone.slice(2);
       if (phone.startsWith('0')) phone = '33' + phone.slice(1);
       phone = phone.replace(/[^\d]/g, '');
-      if (phone.length < 8) return ''; // [UX #2] numéro trop court = invalide
+      if (phone.length < 8) return '';
       return phone;
     }
 
@@ -533,7 +561,6 @@
       return /[";\n]/.test(str) ? '"' + str.replace(/"/g, '""') + '"' : str;
     }
 
-    // [SÉCU #1] Échappement HTML pour tout contenu dynamique injecté via innerHTML
     function esc(str) {
       return String(str ?? '')
         .replace(/&/g, '&amp;')
@@ -543,7 +570,6 @@
         .replace(/'/g, '&#039;');
     }
 
-    // [UX #1] Toast de confirmation non-bloquant
     let toastTimer = null;
     function showToast(msg) {
       if (!els.toast) return;
@@ -555,9 +581,6 @@
       }, 2400);
     }
 
-    // ─────────────────────────────────────────────
-    // CALCULS
-    // ─────────────────────────────────────────────
     function computeTotals() {
       const sessions = state.entries.filter((e) => e.type === 'session');
       const payments = state.entries.filter((e) => e.type === 'payment');
@@ -572,18 +595,14 @@
       };
     }
 
-    // [PERF #2] sortedEntries calculé une seule fois par render, passé en paramètre
     function sortedEntries() {
       return state.entries.slice().sort((a, b) => {
-        const byDate = String(b.date).localeCompare(String(a.date));
+        const byDate = toISODateOnly(b.date).localeCompare(toISODateOnly(a.date));
         if (byDate !== 0) return byDate;
         return String(b.createdAt || '').localeCompare(String(a.createdAt || ''));
       });
     }
 
-    // ─────────────────────────────────────────────
-    // SYNC
-    // ─────────────────────────────────────────────
     function setSyncStatus(message, isError) {
       if (!els.syncStatusText) return;
       els.syncStatusText.textContent = message;
@@ -596,7 +615,7 @@
       return {
         id: entry.id,
         type: entry.type,
-        date: entry.date,
+        date: toISODateOnly(entry.date),
         duration: entry.type === 'session' ? Number(entry.duration || 0) : '',
         rate: entry.type === 'session' ? Number(entry.rate || 0) : '',
         amount: Number(entry.amount || 0),
@@ -609,7 +628,10 @@
       localEntries.concat(remoteEntries).forEach((entry) => {
         if (!entry || !entry.id) return;
         const existing = map.get(entry.id);
-        if (!existing) { map.set(entry.id, entry); return; }
+        if (!existing) {
+          map.set(entry.id, entry);
+          return;
+        }
         const existingCreated = String(existing.createdAt || '');
         const incomingCreated = String(entry.createdAt || '');
         map.set(entry.id, incomingCreated > existingCreated ? entry : existing);
@@ -617,83 +639,92 @@
       return Array.from(map.values());
     }
 
-    // Apps Script impose deux contraintes CORS :
-    //  1. GET : pas de header custom (evite le preflight), redirect: 'follow' obligatoire
-    //  2. POST : Content-Type application/json declenche un preflight bloque.
-    //            On encode en x-www-form-urlencoded, le JSON est dans le champ "payload".
-
     async function fetchRemoteEntries() {
       const syncKey = getSyncKey();
       if (!state.settings.syncUrl || !syncKey) {
-        throw new Error("Merci de renseigner l'URL Apps Script et la cle partagee.");
+        throw new Error("Merci de renseigner l'URL Apps Script et la clé partagée.");
       }
-      // Pas de header custom pour rester en "simple request" (pas de preflight CORS)
+
       const url = state.settings.syncUrl
         + '?key=' + encodeURIComponent(syncKey)
-        + '&t=' + Date.now(); // cache-buster
+        + '&t=' + Date.now();
+
       const response = await fetch(url, { method: 'GET', redirect: 'follow' });
       if (!response.ok) throw new Error("Erreur de lecture Google Sheets (HTTP " + response.status + ").");
+
       const data = await response.json();
-      if (!data || !Array.isArray(data.entries)) throw new Error("Reponse distante invalide.");
-      return data.entries.map((entry) => ({
-        id: String(entry.id || crypto.randomUUID()),
-        type: String(entry.type || 'payment'),
-        date: String(entry.date || todayISO()),
-        duration: entry.type === 'session' ? Number(entry.duration || 0) : undefined,
-        rate: entry.type === 'session' ? Number(entry.rate || 0) : undefined,
-        amount: Number(entry.amount || 0),
-        createdAt: String(entry.createdAt || nowISO())
-      }));
+      if (!data || !Array.isArray(data.entries)) throw new Error('Réponse distante invalide.');
+
+      return data.entries.map((entry) => {
+        const type = String(entry.type || 'payment');
+        return {
+          id: String(entry.id || crypto.randomUUID()),
+          type,
+          date: toISODateOnly(entry.date),
+          duration: type === 'session' ? Number(entry.duration || 0) : undefined,
+          rate: type === 'session' ? Number(entry.rate || 0) : undefined,
+          amount: Number(entry.amount || 0),
+          createdAt: String(entry.createdAt || nowISO())
+        };
+      });
     }
 
     async function pushEntries(entries) {
       const syncKey = getSyncKey();
       if (!state.settings.syncUrl || !syncKey) {
-        throw new Error("Merci de renseigner l'URL Apps Script et la cle partagee.");
+        throw new Error("Merci de renseigner l'URL Apps Script et la clé partagée.");
       }
-      // x-www-form-urlencoded = simple request, pas de preflight CORS
-      const payload = JSON.stringify({ key: syncKey, entries: entries.map(entryToSyncRow) });
+
+      const payload = JSON.stringify({
+        key: syncKey,
+        entries: entries.map(entryToSyncRow)
+      });
+
       const response = await fetch(state.settings.syncUrl, {
         method: 'POST',
         redirect: 'follow',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'payload=' + encodeURIComponent(payload)
       });
-      if (!response.ok) throw new Error("Erreur d'ecriture Google Sheets (HTTP " + response.status + ").");
+
+      if (!response.ok) throw new Error("Erreur d'écriture Google Sheets (HTTP " + response.status + ").");
+
       const data = await response.json();
-      if (!data || data.ok !== true) throw new Error((data && data.error) || "Synchronisation refusee.");
+      if (!data || data.ok !== true) {
+        throw new Error((data && data.error) || 'Synchronisation refusée.');
+      }
       return data;
     }
 
     async function syncBidirectional(showSuccess) {
       try {
-        setSyncStatus("Synchronisation en cours...", false);
+        setSyncStatus('Synchronisation en cours...', false);
         const remoteEntries = await fetchRemoteEntries();
         const merged = mergeEntries(state.entries, remoteEntries);
         state.entries = merged;
         saveState();
         renderFull(sortedEntries());
         await pushEntries(merged);
-        setSyncStatus("Synchronise le " + new Date().toLocaleString('fr-FR'), false);
-        if (showSuccess) showToast("✅ Synchronisation terminee.");
+        setSyncStatus('Synchronisé le ' + new Date().toLocaleString('fr-FR'), false);
+        if (showSuccess) showToast('✅ Synchronisation terminée.');
       } catch (error) {
-        setSyncStatus(error.message || "Erreur de synchronisation.", true);
-        if (showSuccess) alert(error.message || "Erreur de synchronisation.");
+        setSyncStatus(error.message || 'Erreur de synchronisation.', true);
+        if (showSuccess) alert(error.message || 'Erreur de synchronisation.');
       }
     }
 
     async function pullOnly(showSuccess) {
       try {
-        setSyncStatus("Recuperation en cours...", false);
+        setSyncStatus('Récupération en cours...', false);
         const remoteEntries = await fetchRemoteEntries();
         state.entries = mergeEntries(state.entries, remoteEntries);
         saveState();
         renderFull(sortedEntries());
-        setSyncStatus("Donnees recuperees le " + new Date().toLocaleString('fr-FR'), false);
-        if (showSuccess) showToast("✅ Donnees recuperees.");
+        setSyncStatus('Données récupérées le ' + new Date().toLocaleString('fr-FR'), false);
+        if (showSuccess) showToast('✅ Données récupérées.');
       } catch (error) {
-        setSyncStatus(error.message || "Erreur de recuperation.", true);
-        if (showSuccess) alert(error.message || "Erreur de recuperation.");
+        setSyncStatus(error.message || 'Erreur de récupération.', true);
+        if (showSuccess) alert(error.message || 'Erreur de récupération.');
       }
     }
 
@@ -705,25 +736,22 @@
       autoSyncTimer = setTimeout(() => syncBidirectional(false), 1200);
     }
 
-    // ─────────────────────────────────────────────
-    // NAVIGATION
-    // ─────────────────────────────────────────────
     function setCurrentPage(page) {
       state.ui.currentPage = page;
+
       document.querySelectorAll('.page').forEach((el) => el.classList.remove('active'));
       const pageEl = byId('page-' + page);
       if (pageEl) pageEl.classList.add('active');
+
       document.querySelectorAll('.nav-btn').forEach((btn) => {
         const active = btn.dataset.page === page;
         btn.className = 'nav-btn flex flex-col items-center gap-1 rounded-2xl px-2 py-2 font-medium text-[11px] '
           + (active ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400');
       });
+
       saveState();
     }
 
-    // ─────────────────────────────────────────────
-    // RENDU
-    // ─────────────────────────────────────────────
     function renderSettings() {
       if (els.hourlyRateInput) els.hourlyRateInput.value = state.settings.hourlyRate;
       if (els.defaultDurationInput) els.defaultDurationInput.value = state.settings.defaultDuration;
@@ -738,35 +766,46 @@
       if (els.sessionRateInput && !els.sessionRateInput.value) els.sessionRateInput.value = state.settings.hourlyRate;
     }
 
-    // [PERF #2] Accepte le tableau trié en paramètre
     function renderSummary(sorted) {
       const totals = computeTotals();
       if (els.balanceDisplay) els.balanceDisplay.textContent = euro(totals.balance);
       if (els.summaryDue) els.summaryDue.textContent = euro(Math.max(0, totals.balance));
       if (els.summarySessions) els.summarySessions.textContent = String(totals.sessionsCount);
       if (els.summaryPayments) els.summaryPayments.textContent = String(totals.paymentsCount);
+
       const lastSession = sorted.find((e) => e.type === 'session');
       const lastPayment = sorted.find((e) => e.type === 'payment');
-      if (els.lastSessionDisplay) els.lastSessionDisplay.textContent = lastSession ? formatDate(lastSession.date) + ' · ' + lastSession.duration + 'h' : 'Aucune';
-      if (els.lastPaymentDisplay) els.lastPaymentDisplay.textContent = lastPayment ? formatDate(lastPayment.date) + ' · ' + euro(lastPayment.amount) : 'Aucun';
+
+      if (els.lastSessionDisplay) {
+        els.lastSessionDisplay.textContent = lastSession
+          ? formatDate(lastSession.date) + ' · ' + lastSession.duration + 'h'
+          : 'Aucune';
+      }
+
+      if (els.lastPaymentDisplay) {
+        els.lastPaymentDisplay.textContent = lastPayment
+          ? formatDate(lastPayment.date) + ' · ' + euro(lastPayment.amount)
+          : 'Aucun';
+      }
     }
 
-    // [PERF #2] Accepte le tableau trié en paramètre
-    // [SÉCU #1] Toutes les données dynamiques passent par esc()
     function renderHistory(sorted) {
       if (!els.historyList) return;
+
       if (!sorted.length) {
-        els.historyList.innerHTML = '<div class="p-6 text-center text-sm text-slate-500 dark:text-slate-400">Aucune donnee pour le moment.</div>';
+        els.historyList.innerHTML = '<div class="p-6 text-center text-sm text-slate-500 dark:text-slate-400">Aucune donnée pour le moment.</div>';
         return;
       }
+
       els.historyList.innerHTML = sorted.map((entry) => {
         const isSession = entry.type === 'session';
         const icon = isSession ? '🧽' : '💳';
         const title = isSession ? 'Session' : 'Paiement';
         const detail = isSession
           ? esc(String(entry.duration)) + ' h · ' + euro(entry.rate) + '/h'
-          : 'Montant enregistre';
+          : 'Montant enregistré';
         const prefix = isSession ? '+' : '-';
+
         return '<div class="p-4 flex items-start gap-3">'
           + '<div class="mt-0.5 rounded-2xl px-3 py-2 bg-slate-100 dark:bg-slate-800">' + icon + '</div>'
           + '<div class="flex-1 min-w-0">'
@@ -780,6 +819,7 @@
           + '<button data-id="' + esc(entry.id) + '" class="delete-btn text-sm text-red-600 dark:text-red-400 font-medium">Supprimer</button>'
           + '</div></div></div>';
       }).join('');
+
       document.querySelectorAll('.delete-btn').forEach((btn) => {
         btn.addEventListener('click', () => deleteEntry(btn.dataset.id));
       });
@@ -803,26 +843,30 @@
       durationButtons.forEach((btn) => {
         const active = state.ui.selectedDurationMode === 'preset'
           && Number(btn.dataset.value) === Number(state.ui.selectedDurationValue);
+
         btn.className = 'duration-option rounded-2xl border px-4 py-3 text-sm font-medium '
           + (active
             ? 'border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900'
             : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950');
       });
+
       if (els.durationOtherBtn) {
         const custom = state.ui.selectedDurationMode === 'custom';
         els.durationOtherBtn.className = 'rounded-2xl border px-4 py-3 text-sm font-medium '
           + (custom
             ? 'border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900'
             : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950');
+
         if (els.customDurationWrap) els.customDurationWrap.classList.toggle('hidden', !custom);
+
         if (custom && els.customDurationInput && !els.customDurationInput.value) {
           els.customDurationInput.value = state.settings.defaultDuration;
         }
       }
+
       updateSessionComputedAmount();
     }
 
-    // [PERF #1] Rendu léger : pas de reconstruction de l'historique
     function renderLight() {
       saveState();
       renderSettings();
@@ -831,7 +875,6 @@
       setCurrentPage(state.ui.currentPage);
     }
 
-    // [PERF #1] Rendu complet : recalcule le tableau trié une seule fois
     function renderFull(sorted) {
       const s = sorted || sortedEntries();
       saveState();
@@ -842,14 +885,11 @@
       setCurrentPage(state.ui.currentPage);
     }
 
-    // ─────────────────────────────────────────────
-    // MUTATIONS
-    // ─────────────────────────────────────────────
     function addSession(date, duration, rate) {
       state.entries.push({
         id: crypto.randomUUID(),
         type: 'session',
-        date: date,
+        date: toISODateOnly(date),
         duration: Number(duration),
         rate: Number(rate),
         amount: Number((Number(duration) * Number(rate)).toFixed(2)),
@@ -863,7 +903,7 @@
       state.entries.push({
         id: crypto.randomUUID(),
         type: 'payment',
-        date: date,
+        date: toISODateOnly(date),
         amount: Number(Number(amount).toFixed(2)),
         createdAt: nowISO()
       });
@@ -871,7 +911,6 @@
       queueAutoSync();
     }
 
-    // Modale de confirmation (remplace confirm() bloqué sur mobile/hébergement)
     let _pendingDeleteId = null;
     const confirmModal = byId('confirmModal');
     const confirmText = byId('confirmText');
@@ -897,31 +936,37 @@
         state.entries = state.entries.filter((item) => item.id !== _pendingDeleteId);
         closeConfirm();
         renderFull();
-        showToast("🗑️ Entrée supprimée.");
+        showToast('🗑️ Entrée supprimée.');
         queueAutoSync();
       });
     }
+
     if (confirmCancelBtn) confirmCancelBtn.addEventListener('click', closeConfirm);
-    if (confirmModal) confirmModal.addEventListener('click', (e) => { if (e.target === confirmModal) closeConfirm(); });
+    if (confirmModal) {
+      confirmModal.addEventListener('click', (e) => {
+        if (e.target === confirmModal) closeConfirm();
+      });
+    }
 
     function deleteEntry(id) {
       openConfirm(id);
     }
 
-    // ─────────────────────────────────────────────
-    // EXPORT CSV
-    // ─────────────────────────────────────────────
     function exportCsv() {
       const rows = [['id', 'type', 'date', 'duree_heures', 'taux_horaire', 'montant', 'created_at']];
+
       sortedEntries().reverse().forEach((entry) => {
         rows.push([
-          entry.id, entry.type, entry.date,
+          entry.id,
+          entry.type,
+          toISODateOnly(entry.date),
           entry.type === 'session' ? entry.duration : '',
           entry.type === 'session' ? entry.rate : '',
           entry.amount,
           entry.createdAt || ''
         ]);
       });
+
       const csv = rows.map((row) => row.map(csvEscape).join(';')).join('\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
@@ -932,12 +977,9 @@
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      showToast("📥 Fichier CSV telecharge.");
+      showToast('📥 Fichier CSV téléchargé.');
     }
 
-    // ─────────────────────────────────────────────
-    // MENU FAB
-    // ─────────────────────────────────────────────
     function openAddMenu() {
       if (!els.addMenuModal || !els.fabShell) return;
       els.addMenuModal.classList.remove('hidden');
@@ -950,30 +992,24 @@
       els.fabShell.classList.remove('open');
     }
 
-    // ─────────────────────────────────────────────
-    // EVENT LISTENERS
-    // ─────────────────────────────────────────────
     document.querySelectorAll('.nav-btn').forEach((btn) => {
       btn.addEventListener('click', () => setCurrentPage(btn.dataset.page));
     });
 
     if (els.exportCsvBtn) els.exportCsvBtn.addEventListener('click', exportCsv);
 
-    // [BUG #3] Quick add : réinitialiser sessionRateInput après l'action
     if (els.quickAddTodayBtn) {
       els.quickAddTodayBtn.addEventListener('click', () => {
         addSession(todayISO(), state.settings.defaultDuration, state.settings.hourlyRate);
-        // [BUG #3] Réinitialisation du champ taux pour éviter la désynchronisation
         if (els.sessionRateInput) {
           els.sessionRateInput.value = state.settings.hourlyRate;
           els.sessionRateInput.dataset.userEdited = '';
         }
-        showToast("✅ Session ajoutee !");
+        showToast('✅ Session ajoutée.');
         setCurrentPage('history');
       });
     }
 
-    // [PERF #1] Changement de taux → rendu léger (pas de reconstruction historique)
     if (els.hourlyRateInput) {
       els.hourlyRateInput.addEventListener('change', () => {
         state.settings.hourlyRate = Number(Math.max(0, Number(els.hourlyRateInput.value || 0)).toFixed(2));
@@ -1027,7 +1063,6 @@
       });
     }
 
-    // Clé sync sauvegardée dans localStorage
     if (els.syncKeyInput) {
       els.syncKeyInput.addEventListener('change', () => {
         setSyncKey(els.syncKeyInput.value);
@@ -1069,15 +1104,17 @@
 
     if (els.saveSessionBtn) {
       els.saveSessionBtn.addEventListener('click', () => {
-        const date = (els.sessionDateInput && els.sessionDateInput.value) || todayISO();
+        const date = toISODateOnly((els.sessionDateInput && els.sessionDateInput.value) || todayISO());
         const duration = Number(getSelectedDuration());
         const rate = Number((els.sessionRateInput && els.sessionRateInput.value) || 0);
-        // [BUG #2] rate <= 0 bloqué (taux à 0 interdit)
+
         if (duration <= 0 || rate <= 0) {
-          alert("Merci de renseigner une duree valide et un taux horaire superieur a 0.");
+          alert('Merci de renseigner une durée valide et un taux horaire supérieur à 0.');
           return;
         }
+
         addSession(date, duration, rate);
+
         if (els.sessionDateInput) els.sessionDateInput.value = todayISO();
         if (els.sessionRateInput) {
           els.sessionRateInput.value = state.settings.hourlyRate;
@@ -1086,23 +1123,28 @@
         if (state.ui.selectedDurationMode === 'custom' && els.customDurationInput) {
           els.customDurationInput.value = '';
         }
-        showToast("✅ Session enregistree !");
+
+        showToast('✅ Session enregistrée.');
         setCurrentPage('history');
       });
     }
 
     if (els.savePaymentBtn) {
       els.savePaymentBtn.addEventListener('click', () => {
-        const date = (els.paymentDateInput && els.paymentDateInput.value) || todayISO();
+        const date = toISODateOnly((els.paymentDateInput && els.paymentDateInput.value) || todayISO());
         const amount = Number((els.paymentAmountInput && els.paymentAmountInput.value) || 0);
+
         if (amount <= 0) {
-          alert("Merci de renseigner un montant valide.");
+          alert('Merci de renseigner un montant valide.');
           return;
         }
+
         addPayment(date, amount);
+
         if (els.paymentDateInput) els.paymentDateInput.value = todayISO();
         if (els.paymentAmountInput) els.paymentAmountInput.value = '';
-        showToast("✅ Paiement enregistre !");
+
+        showToast('✅ Paiement enregistré.');
         setCurrentPage('history');
       });
     }
@@ -1116,17 +1158,25 @@
     if (els.openChatgptBtn) {
       els.openChatgptBtn.addEventListener('click', () => {
         const text = (els.contactMessageInput && els.contactMessageInput.value.trim()) || '';
-        if (!text) { alert("Merci de rediger un message."); return; }
-        const selectedLanguage = (els.translationLanguageSelect
-          && els.translationLanguageSelect.options[els.translationLanguageSelect.selectedIndex]
-          && els.translationLanguageSelect.options[els.translationLanguageSelect.selectedIndex].text.toLowerCase())
-          || "la langue choisie";
+        if (!text) {
+          alert('Merci de rédiger un message.');
+          return;
+        }
+
+        const selectedLanguage = (
+          els.translationLanguageSelect &&
+          els.translationLanguageSelect.options[els.translationLanguageSelect.selectedIndex] &&
+          els.translationLanguageSelect.options[els.translationLanguageSelect.selectedIndex].text.toLowerCase()
+        ) || 'la langue choisie';
+
         const contactName = (state.settings.contactName || '').trim();
         const template = (state.settings.chatgptPromptTemplate || defaultState.settings.chatgptPromptTemplate).trim();
+
         const prompt = template
-          .replaceAll('{prenom}', contactName || 'ma femme de menage')
+          .replaceAll('{prenom}', contactName || 'ma femme de ménage')
           .replaceAll('{langue}', selectedLanguage)
           .replaceAll('{message}', text);
+
         window.open('https://chatgpt.com/?q=' + encodeURIComponent(prompt), '_blank');
       });
     }
@@ -1134,46 +1184,52 @@
     if (els.openWhatsappBtn) {
       els.openWhatsappBtn.addEventListener('click', () => {
         const phone = normalizePhone(state.settings.contactPhone);
-        // [UX #2] Numéro invalide → message clair
+
         if (!phone) {
           setCurrentPage('settings');
-          alert("Merci de renseigner un numero WhatsApp valide dans les parametres.");
+          alert('Merci de renseigner un numéro WhatsApp valide dans les paramètres.');
           return;
         }
-        const text = ((els.translatedMessageOutput && els.translatedMessageOutput.value)
-          || (els.contactMessageInput && els.contactMessageInput.value)
-          || '').trim();
+
+        const text = (
+          (els.translatedMessageOutput && els.translatedMessageOutput.value) ||
+          (els.contactMessageInput && els.contactMessageInput.value) ||
+          ''
+        ).trim();
+
         if (!text) {
-          alert("Merci de rediger un message avant d'ouvrir WhatsApp.");
+          alert("Merci de rédiger un message avant d'ouvrir WhatsApp.");
           return;
         }
+
         window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(text), '_blank');
       });
     }
 
     if (els.addMenuBtn) els.addMenuBtn.addEventListener('click', openAddMenu);
+
     if (els.addSessionQuick) {
       els.addSessionQuick.addEventListener('click', () => {
         closeAddMenuSheet();
         setCurrentPage('session');
       });
     }
+
     if (els.addPaymentQuick) {
       els.addPaymentQuick.addEventListener('click', () => {
         closeAddMenuSheet();
         setCurrentPage('payment');
       });
     }
+
     if (els.closeAddMenu) els.closeAddMenu.addEventListener('click', closeAddMenuSheet);
+
     if (els.addMenuModal) {
       els.addMenuModal.addEventListener('click', (event) => {
         if (event.target === els.addMenuModal) closeAddMenuSheet();
       });
     }
 
-    // ─────────────────────────────────────────────
-    // INIT
-    // ─────────────────────────────────────────────
     if (els.sessionDateInput) els.sessionDateInput.value = todayISO();
     if (els.paymentDateInput) els.paymentDateInput.value = todayISO();
 
