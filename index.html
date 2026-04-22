@@ -155,9 +155,6 @@
         <p class="text-sm text-slate-500 dark:text-slate-400">Gestion simple et locale</p>
         <h1 class="text-2xl font-semibold tracking-tight">Employée de maison</h1>
       </div>
-      <button id="exportCsvBtn" class="inline-flex items-center gap-2 rounded-2xl bg-white/80 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-2 text-sm shadow-soft">
-        <span>⬇️</span><span>CSV</span>
-      </button>
     </header>
 
     <main>
@@ -293,10 +290,9 @@
             <textarea id="contactMessageInput" rows="5" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Écrivez votre message..."></textarea>
           </div>
 
-          <div class="grid grid-cols-3 gap-3">
-            <button id="openChatgptBtn" class="rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 px-4 py-3 font-medium text-sm">ChatGPT</button>
+          <div class="grid grid-cols-2 gap-3">
             <button id="translateMessageBtn" class="rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-3 font-medium text-sm">Traduire</button>
-            <button id="openWhatsappBtn" class="rounded-2xl bg-apple-600 hover:bg-apple-700 text-white px-4 py-3 font-medium text-sm">WhatsApp</button>
+            <button id="openWhatsappBtn" class="rounded-2xl text-white px-4 py-3 font-medium text-sm" style="background:#25D366;">WhatsApp</button>
           </div>
 
           <p id="translateStatusText" class="hidden text-sm text-slate-500 dark:text-slate-400">Traduction en cours...</p>
@@ -341,8 +337,8 @@
                 </select>
               </div>
               <div>
-                <label for="chatgptPromptTemplateInput" class="block text-sm font-medium mb-1">Prompt ChatGPT personnalisé</label>
-                <textarea id="chatgptPromptTemplateInput" rows="5" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Utilisez {prenom}, {langue}, {message}"></textarea>
+                <label for="translationPromptTemplateInput" class="block text-sm font-medium mb-1">Prompt de traduction</label>
+                <textarea id="translationPromptTemplateInput" rows="5" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 outline-none focus:ring-2 focus:ring-apple-500" placeholder="Utilisez {prenom}, {langue}, {message}"></textarea>
                 <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Variables : {prenom}, {langue}, {message}</p>
               </div>
             </div>
@@ -421,7 +417,7 @@
         contactPhone: '',
         contactName: '',
         translationLanguage: 'es',
-        chatgptPromptTemplate: 'Prepare un message simple, poli et naturel a ma femme de menage {prenom} en {langue} : {message}',
+        translationPromptTemplate: 'Prepare un message simple, poli et naturel a ma femme de menage {prenom} en {langue} : {message}',
         syncUrl: '',
         syncKey: ''
       },
@@ -449,7 +445,7 @@
             contactPhone: String(parsed?.settings?.contactPhone ?? defaultState.settings.contactPhone),
             contactName: String(parsed?.settings?.contactName ?? defaultState.settings.contactName),
             translationLanguage: String(parsed?.settings?.translationLanguage ?? defaultState.settings.translationLanguage),
-            chatgptPromptTemplate: String(parsed?.settings?.chatgptPromptTemplate ?? defaultState.settings.chatgptPromptTemplate),
+            translationPromptTemplate: String(parsed?.settings?.translationPromptTemplate ?? defaultState.settings.translationPromptTemplate),
             syncUrl: String(parsed?.settings?.syncUrl ?? defaultState.settings.syncUrl),
             syncKey: String(parsed?.settings?.syncKey ?? defaultState.settings.syncKey)
           },
@@ -487,12 +483,11 @@
       lastSessionDisplay: byId('lastSessionDisplay'),
       lastPaymentDisplay: byId('lastPaymentDisplay'),
       historyList: byId('historyList'),
-      exportCsvBtn: byId('exportCsvBtn'),
       hourlyRateInput: byId('hourlyRateInput'),
       defaultDurationInput: byId('defaultDurationInput'),
       contactPhoneInput: byId('contactPhoneInput'),
       contactNameInput: byId('contactNameInput'),
-      chatgptPromptTemplateInput: byId('chatgptPromptTemplateInput'),
+      translationPromptTemplateInput: byId('translationPromptTemplateInput'),
       translationLanguageSelect: byId('translationLanguageSelect'),
       quickAddTodayBtn: byId('quickAddTodayBtn'),
       sessionDateInput: byId('sessionDateInput'),
@@ -507,7 +502,6 @@
       savePaymentBtn: byId('savePaymentBtn'),
       contactMessageInput: byId('contactMessageInput'),
       translatedMessageOutput: byId('translatedMessageOutput'),
-      openChatgptBtn: byId('openChatgptBtn'),
       translateMessageBtn: byId('translateMessageBtn'),
       translateStatusText: byId('translateStatusText'),
       openWhatsappBtn: byId('openWhatsappBtn'),
@@ -604,10 +598,6 @@
       return phone;
     }
 
-    function csvEscape(value) {
-      const str = String(value ?? '');
-      return /[";\n]/.test(str) ? '"' + str.replace(/"/g, '""') + '"' : str;
-    }
 
     function esc(str) {
       return String(str ?? '')
@@ -744,7 +734,8 @@
         action: 'translate',
         message: message,
         language: state.settings.translationLanguage || 'es',
-        contactName: state.settings.contactName || ''
+        contactName: state.settings.contactName || '',
+        promptTemplate: state.settings.translationPromptTemplate || defaultState.settings.translationPromptTemplate
       });
 
       const response = await fetch(state.settings.syncUrl, {
@@ -832,7 +823,7 @@
       if (els.contactPhoneInput) els.contactPhoneInput.value = state.settings.contactPhone;
       if (els.contactNameInput) els.contactNameInput.value = state.settings.contactName;
       if (els.translationLanguageSelect) els.translationLanguageSelect.value = state.settings.translationLanguage;
-      if (els.chatgptPromptTemplateInput) els.chatgptPromptTemplateInput.value = state.settings.chatgptPromptTemplate;
+      if (els.translationPromptTemplateInput) els.translationPromptTemplateInput.value = state.settings.translationPromptTemplate;
       if (els.syncUrlInput) els.syncUrlInput.value = state.settings.syncUrl;
       if (els.syncKeyInput) els.syncKeyInput.value = state.settings.syncKey;
       if (els.sessionDateInput && !els.sessionDateInput.value) els.sessionDateInput.value = todayISO();
@@ -1026,33 +1017,6 @@
       openConfirm(id);
     }
 
-    function exportCsv() {
-      const rows = [['id', 'type', 'date', 'duree_heures', 'taux_horaire', 'montant', 'created_at']];
-
-      sortedEntries().reverse().forEach((entry) => {
-        rows.push([
-          entry.id,
-          entry.type,
-          toISODateOnly(entry.date),
-          entry.type === 'session' ? entry.duration : '',
-          entry.type === 'session' ? entry.rate : '',
-          entry.amount,
-          entry.createdAt || ''
-        ]);
-      });
-
-      const csv = rows.map((row) => row.map(csvEscape).join(';')).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'remuneration-employe-maison-' + todayISO() + '.csv';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      showToast('📥 Fichier CSV téléchargé.');
-    }
 
     function openAddMenu() {
       if (!els.addMenuModal || !els.fabShell) return;
@@ -1070,7 +1034,6 @@
       btn.addEventListener('click', () => setCurrentPage(btn.dataset.page));
     });
 
-    if (els.exportCsvBtn) els.exportCsvBtn.addEventListener('click', exportCsv);
 
     if (els.quickAddTodayBtn) {
       els.quickAddTodayBtn.addEventListener('click', () => {
@@ -1122,9 +1085,9 @@
       });
     }
 
-    if (els.chatgptPromptTemplateInput) {
-      els.chatgptPromptTemplateInput.addEventListener('change', () => {
-        state.settings.chatgptPromptTemplate = els.chatgptPromptTemplateInput.value.trim() || defaultState.settings.chatgptPromptTemplate;
+    if (els.translationPromptTemplateInput) {
+      els.translationPromptTemplateInput.addEventListener('change', () => {
+        state.settings.translationPromptTemplate = els.translationPromptTemplateInput.value.trim() || defaultState.settings.translationPromptTemplate;
         saveState();
       });
     }
@@ -1229,31 +1192,6 @@
       });
     });
 
-    if (els.openChatgptBtn) {
-      els.openChatgptBtn.addEventListener('click', () => {
-        const text = (els.contactMessageInput && els.contactMessageInput.value.trim()) || '';
-        if (!text) {
-          alert('Merci de rédiger un message.');
-          return;
-        }
-
-        const selectedLanguage = (
-          els.translationLanguageSelect &&
-          els.translationLanguageSelect.options[els.translationLanguageSelect.selectedIndex] &&
-          els.translationLanguageSelect.options[els.translationLanguageSelect.selectedIndex].text.toLowerCase()
-        ) || 'la langue choisie';
-
-        const contactName = (state.settings.contactName || '').trim();
-        const template = (state.settings.chatgptPromptTemplate || defaultState.settings.chatgptPromptTemplate).trim();
-
-        const prompt = template
-          .replaceAll('{prenom}', contactName || 'ma femme de ménage')
-          .replaceAll('{langue}', selectedLanguage)
-          .replaceAll('{message}', text);
-
-        window.open('https://chatgpt.com/?q=' + encodeURIComponent(prompt), '_blank');
-      });
-    }
 
     if (els.translateMessageBtn) {
       els.translateMessageBtn.addEventListener('click', async () => {
