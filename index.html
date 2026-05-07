@@ -131,14 +131,6 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Clean' App" />
   <meta name="theme-color" content="#2563eb" />
-    <!-- Les antennes de base pour Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <!-- L'antenne pour l'authentification (la serrure magique) -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <!-- L'antenne pour la base de données (le carnet intelligent) -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-  <!-- Ton code actuel continue après ça -->
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen">
 
@@ -146,9 +138,12 @@
 
   <div id="authScreen" class="hidden min-h-screen max-w-md mx-auto px-4 py-8 flex flex-col justify-center">
     <div class="mb-8 text-center">
-      <div class="mx-auto mb-4 w-16 h-16 rounded-3xl bg-gradient-to-br from-apple-500 to-apple-700 text-white flex items-center justify-center text-3xl shadow-soft">🧽</div>
+      <img src="icons/icon-180.png" alt="Clean' App" class="mx-auto mb-4 w-20 h-20 rounded-3xl shadow-soft object-cover" />
       <p class="text-sm text-slate-500 dark:text-slate-400">Bienvenue sur</p>
-      <h1 class="text-3xl font-semibold tracking-tight">Clean' App !</h1>
+<h1 class="text-3xl font-semibold tracking-tight">Clean' App !</h1>
+<p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+  Gérez votre employée de maison en toute simplicité.
+</p>
     </div>
 
     <section class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 shadow-soft space-y-4">
@@ -169,6 +164,7 @@
 
       <button id="authSubmitBtn" class="w-full rounded-2xl bg-apple-600 hover:bg-apple-700 text-white px-4 py-3 font-medium">Se connecter</button>
 
+      <p id="authHintText" class="text-sm text-slate-500 dark:text-slate-400 text-center">Créez votre compte pour commencer.</p>
     </section>
   </div>
 
@@ -457,7 +453,7 @@
     // Colle ici ton URL Apps Script déployée en web app.
     // Elle est volontairement dans une constante pour éviter de l'afficher aux utilisateurs non-admins.
     // Attention : elle reste techniquement visible dans le code source du navigateur.
-    const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbzvKs45ZUsPjmivdIV0o5dXkOMYFzCmeO5273-KpHxfoCp9TOXvhXm9eaih-9AZdi0/exec';
+    const DEFAULT_API_URL = 'COLLE_ICI_TON_URL_APPS_SCRIPT';
 
     const STORAGE_KEY = 'cleanAppMultiUserV1';
 
